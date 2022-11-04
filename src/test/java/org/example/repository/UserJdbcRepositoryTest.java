@@ -1,11 +1,9 @@
-package org.example.service;
+package org.example.repository;
 
 import org.assertj.core.api.Assertions;
 import org.example.model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class UserJdbcRepositoryTest {
 
@@ -27,10 +25,8 @@ class UserJdbcRepositoryTest {
         String userPw = "test1";
 
         repository = new UserJdbcRepository();
-        repository.save(userId, userPw);
-
-        User byId = repository.findById(userId);
-        Assertions.assertThat(userId).isEqualTo(byId.getUserId());
-
+        Assertions.assertThatThrownBy(() ->{
+            repository.save(userId,userPw);
+        }).isInstanceOf(RuntimeException.class);
     }
 }

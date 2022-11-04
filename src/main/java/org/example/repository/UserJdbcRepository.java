@@ -1,4 +1,4 @@
-package org.example.service;
+package org.example.repository;
 
 import org.example.model.User;
 
@@ -18,17 +18,20 @@ public class UserJdbcRepository implements UserRepository{
             String pw = "1234";
 
             conn = DriverManager.getConnection(url, id, pw);
-
+//            conn.setAutoCommit(false);
             pstmt = conn.prepareStatement("insert into USER values(?,?,0)");
+//            Savepoint savepoint1 = conn.setSavepoint("SavePoint1");
             pstmt.setString(1,userId);
             pstmt.setString(2,userPw);
             pstmt.executeUpdate();
 
+//            conn.commit();
             pstmt.close();
             conn.close();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {
+//            conn.rollback();
             throw new RuntimeException(e);
         }
         return null;

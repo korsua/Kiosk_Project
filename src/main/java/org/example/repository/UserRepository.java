@@ -1,4 +1,4 @@
-package org.example.service;
+package org.example.repository;
 
 import org.example.model.User;
 
