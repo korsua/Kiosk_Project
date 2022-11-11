@@ -2,9 +2,9 @@ package org.example.model;
 
 public class Cart {
     Long cartId;
-    Long orderId;
+    String userId;
     Long productId;
-    Long bigint;
+    Long amount;
     Long salePrice;
 
     public Long getCartId() {
@@ -15,12 +15,12 @@ public class Cart {
         this.cartId = cartId;
     }
 
-    public Long getOrderId() {
-        return orderId;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public Long getProductId() {
@@ -31,12 +31,12 @@ public class Cart {
         this.productId = productId;
     }
 
-    public Long getBigint() {
-        return bigint;
+    public Long getAmount() {
+        return amount;
     }
 
-    public void setBigint(Long bigint) {
-        this.bigint = bigint;
+    public void setAmount(Long bigint) {
+        this.amount = bigint;
     }
 
     public Long getSalePrice() {

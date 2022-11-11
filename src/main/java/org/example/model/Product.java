@@ -5,6 +5,15 @@ public class Product {
     String name;
     Long price;
 
+    public Product(){
+
+    }
+    public Product(Long id, String name, Long price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+
     public Long getId() {
         return id;
     }
@@ -28,4 +37,5 @@ public class Product {
     public void setPrice(Long price) {
         this.price = price;
     }
+
 }

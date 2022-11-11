@@ -10,6 +10,7 @@ import java.util.List;
 
 class ProductJdbcRepositoryTest {
     ProductJdbcRepository repository = new ProductJdbcRepository();
+
     @ParameterizedTest
     @ValueSource(strings = {"라면","볶음밥","콜라","우유"})
     public void save(String name){

@@ -21,7 +21,7 @@ class UserJdbcRepositoryTest {
     @Test
     @DisplayName("(중복유저는 안됌)유저를 만든다.")
     public void saveUserTest(){
-        String userId = "test1";
+        String userId = "test";
         String userPw = "test1";
 
         repository = new UserJdbcRepository();

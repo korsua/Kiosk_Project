@@ -1,14 +1,14 @@
 package org.example.repository;
 
-import org.example.model.User;
+import org.example.model.Cart;
+import org.example.model.Product;
 
 import java.sql.*;
+import java.util.List;
 
-public class UserJdbcRepository implements UserRepository{
-
+public class CartJdbcRepository implements CartRepository{
     @Override
-    public User save(String userId, String userPw) {
-        User user = new User();
+    public void save(Product product, String userId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -19,30 +19,24 @@ public class UserJdbcRepository implements UserRepository{
             String pw = "1234";
 
             conn = DriverManager.getConnection(url, id, pw);
-//            conn.setAutoCommit(false);
-            pstmt = conn.prepareStatement("insert into USER values(?,?,0)");
-//            Savepoint savepoint1 = conn.setSavepoint("SavePoint1");
+            pstmt = conn.prepareStatement("insert into CART(userId,productId,price) values(?,?,?)");
             pstmt.setString(1,userId);
-            pstmt.setString(2,userPw);
+            pstmt.setLong(2,product.getId());
+            pstmt.setLong(3, product.getPrice());
             pstmt.executeUpdate();
 
-            user.setUserId(userId);
-            user.setUserPw(userPw);
-//            conn.commit();
             pstmt.close();
             conn.close();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {
-//            conn.rollback();
             throw new RuntimeException(e);
         }
-        return user;
     }
 
     @Override
-    public User findById(String userId) {
-        User user = new User();
+    public Cart findById(Long cartId) {
+        Cart cart = null;
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -53,21 +47,22 @@ public class UserJdbcRepository implements UserRepository{
             String pw = "1234";
 
             conn = DriverManager.getConnection(url, id, pw);
-
-            pstmt = conn.prepareStatement("select userPw, role from USER where userId = ?");
-            pstmt.setString(1,userId);
+            pstmt = conn.prepareStatement("select * from CART WEHRE cartId = ?");
+            pstmt.setLong(1,cartId);
             rs = pstmt.executeQuery();
-
-
-            while(rs.next()){
-                String userPw = rs.getString(1);
-                Boolean role = rs.getBoolean(2);
-                user.setUserId(userId);
-                user.setUserPw(userPw);
-                user.setRole(role);
+            if (rs.next()) {
+                cart = new Cart();
+                String userId = rs.getString("userId");
+                Long productId = rs.getLong("productId");
+                Long amount = rs.getLong("amount");
+                Long saleprice = rs.getLong("price");
+                cart.setCartId(cartId);
+                cart.setProductId(productId);
+                cart.setSalePrice(saleprice);
+                cart.setUserId(userId);
+                cart.setAmount(amount);
             }
 
-            rs.close();
             pstmt.close();
             conn.close();
         } catch (ClassNotFoundException e) {
@@ -75,6 +70,21 @@ public class UserJdbcRepository implements UserRepository{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return user;
+        return cart;
+    }
+
+    @Override
+    public int updateById(Long cartId, int count) {
+        return 0;
+    }
+
+    @Override
+    public List<Cart> findAll() {
+        return null;
+    }
+
+    @Override
+    public int deleteAll() {
+        return 0;
     }
 }
