@@ -1,5 +1,6 @@
 package org.example.view;
 
+import org.example.model.User;
 import org.example.service.UserService;
 
 import javax.swing.*;
@@ -7,8 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class RegisterUserView extends JFrame {
-    JButton homeBtn;
+public class LoginUserView extends JFrame {
     JPanel headerPanel;
     JPanel footerPanel;
     JLabel idLabel;
@@ -20,14 +20,16 @@ public class RegisterUserView extends JFrame {
     JButton confirm;
     JLabel message;
     private UserService userService;
+    JButton homeBtn;
 
-    public RegisterUserView() throws HeadlessException {
+    public LoginUserView() throws HeadlessException {
         userService = new UserService();
 
         Container ct = getContentPane();
         setLayout(new BoxLayout(ct, BoxLayout.Y_AXIS));
+
         headerPanel = new JPanel(new FlowLayout());
-        message = new JLabel("hi Register Page");
+        message = new JLabel("hi Login page");
 
         idPanel = new JPanel();
         idLabel = new JLabel("id : ");
@@ -39,6 +41,7 @@ public class RegisterUserView extends JFrame {
 
         footerPanel = new JPanel(new FlowLayout());
         confirm = new JButton("확인");
+
         homeBtn = new JButton("홈");
 
 
@@ -64,9 +67,16 @@ public class RegisterUserView extends JFrame {
         confirm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(userService.join(idTextFiled.getText(), pwTextFiled.getText()) != null){
-                    dispose();
-                    new LoginUserView();
+                User user = userService.loginById(idTextFiled.getText());
+                if(user != null){
+                    String pw = user.getUserPw();
+                    if (pw.equals(pwTextFiled.getText())) {
+                        dispose();
+                        new ProductListView(user.getUserId());
+                    }
+                    else{
+                        message.setText("비밀번호가 틀렸습니다.");
+                    }
                 }
 
             }

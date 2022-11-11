@@ -73,7 +73,7 @@ public class ProductJdbcRepository implements ProductRepository{
     public List<Product> findAll() {
         List<Product> list = new ArrayList<>();
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             url = "jdbc:mysql://localhost/dev";
             dbId = "root";
             dbPw = "1234";
@@ -84,7 +84,7 @@ public class ProductJdbcRepository implements ProductRepository{
             while (rs.next()) {
                 System.out.println("hi");
                 Product product = new Product();
-                product.setId(rs.getLong("id"));
+                product.setId(rs.getLong("productId"));
                 product.setName(rs.getString("name"));
                 product.setPrice(rs.getLong("price"));
                 list.add(product);

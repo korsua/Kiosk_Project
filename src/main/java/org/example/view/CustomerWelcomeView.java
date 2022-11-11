@@ -9,20 +9,30 @@ public class CustomerWelcomeView  extends JFrame {
     JButton loginBtn;
     JButton registerBtn;
     JPanel jPanel;
-    LoginView loginView;
     public CustomerWelcomeView() {
         getContentPane();
 
         jPanel = new JPanel(new FlowLayout());
 
-        loginView = new LoginView();
+        add(jPanel);
+//        loginView = new LoginView();
         loginBtn = new JButton("로그인");
         loginBtn.setPreferredSize(new Dimension(50,30));
         jPanel.add(loginBtn);
-        add(jPanel);
 //        add(loginView);
 
+        registerBtn = new JButton("회원가입");
+        registerBtn.setPreferredSize(new Dimension(50,30));
+        jPanel.add(registerBtn);
 
+
+        registerBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new RegisterUserView();
+            }
+        });
         loginBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -31,7 +41,7 @@ public class CustomerWelcomeView  extends JFrame {
 //                repaint();
 //                revalidate();
                 dispose();
-                new RegisterUserView();
+                new LoginUserView();
 
             }
         });
@@ -44,7 +54,8 @@ public class CustomerWelcomeView  extends JFrame {
 
     public static void main(String[] args) {
 //        new CustomerWelcomeView();
-        new RegisterUserView();
+//        new LoginUserView();
+        new ProductListView("test");
 
     }
 }
