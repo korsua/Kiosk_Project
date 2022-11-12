@@ -1,51 +1,43 @@
 package org.example.view;
 
+import org.example.model.User;
 import org.example.service.UserService;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class LoginFrame extends JFrame{
-    private JButton button1;
-    private JTextField textField1;
-    private JTextField textField2;
+    private JButton submitBtn;
+    private JTextField idField;
     private JPanel loginPanel;
+    private JPasswordField pwField;
+    private JButton homeBtn;
+    private UserService userService;
 
     public LoginFrame() {
-//        Container ct = getContentPane();
-//        ct.add(loginPanel);
-        setContentPane(loginPanel);
-        setTitle("Welcome");
-        setSize(450,300);
+        userService = UserService.getInstance();
+
+        add(loginPanel);
+        setSize(700,500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
-        textField1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("바뀜");
+        submitBtn.addActionListener(e -> {
+            User user = userService.loginById(idField.getText());
+            if(user != null){
+                String pw = user.getUserPw();
+                if (pw.equals(pwField.getText())) {
+                    dispose();
+                    new CustomerHome();
+                }
+                else{
+                    JOptionPane.showConfirmDialog(null,"비밀번호 에러","비밀번호가 틀렸습니다",JOptionPane.PLAIN_MESSAGE);
+                }
             }
+
         });
-
-        button1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                UserService service = new UserService();
-                String userId = textField1.getText();
-                String userPw = textField2.getText();
-                service.join(userId,userPw);
-                setVisible(false);
-//                if(service.loginById(userId).getUserPw().equals(userPw)){
-//                    textField1.setText("성공하셨습니다.");
-//                    setVisible(false);
-//                }else{
-//                    textField1.setText("실패하셨습니다.");
-//                    setVisible(false);
-//                }
-
-            }
+        homeBtn.addActionListener((event) ->{
+            dispose();
+            new HelloHome();
         });
     }
-
-
 }

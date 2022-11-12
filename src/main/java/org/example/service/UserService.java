@@ -7,9 +7,14 @@ import org.example.repository.UserRepository;
 
 public class UserService {
     private static UserRepository repository = null;
+    private static UserService instance;
 
-    public UserService() {
-        repository = new UserJdbcRepository();
+    private UserService(UserRepository userRepository){
+        this.repository = userRepository;
+    }
+    public static synchronized UserService getInstance(){
+        if(instance == null) instance = new UserService(new UserJdbcRepository());
+        return instance;
     }
 
     public User join(String userId, String userPw) {
