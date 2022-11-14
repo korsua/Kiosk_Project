@@ -36,16 +36,6 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="13eb5" class="javax.swing.JTextField" binding="idField">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-            </constraints>
-            <properties>
-              <text value=""/>
-            </properties>
-          </component>
           <component id="9c584" class="javax.swing.JLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -68,6 +58,16 @@
             </constraints>
             <properties>
               <text value="PW"/>
+            </properties>
+          </component>
+          <component id="13eb5" class="javax.swing.JTextField" binding="idField">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <text value=""/>
             </properties>
           </component>
         </children>

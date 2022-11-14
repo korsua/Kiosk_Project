@@ -46,4 +46,15 @@ public class Cart {
     public void setSalePrice(Long salePrice) {
         this.salePrice = salePrice;
     }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "cartId=" + cartId +
+                ", userId='" + userId + '\'' +
+                ", productId=" + productId +
+                ", amount=" + amount +
+                ", salePrice=" + salePrice +
+                '}';
+    }
 }

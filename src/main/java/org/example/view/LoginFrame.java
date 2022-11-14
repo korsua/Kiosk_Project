@@ -14,9 +14,10 @@ public class LoginFrame extends JFrame{
     private UserService userService;
 
     public LoginFrame() {
+        setContentPane(loginPanel);
+//        add(loginPanel);
         userService = UserService.getInstance();
 
-        add(loginPanel);
         setSize(700,500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
@@ -27,7 +28,7 @@ public class LoginFrame extends JFrame{
                 String pw = user.getUserPw();
                 if (pw.equals(pwField.getText())) {
                     dispose();
-                    new CustomerHome();
+                    new CustomerHome(user.getUserId());
                 }
                 else{
                     JOptionPane.showConfirmDialog(null,"비밀번호 에러","비밀번호가 틀렸습니다",JOptionPane.PLAIN_MESSAGE);

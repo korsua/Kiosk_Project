@@ -8,9 +8,11 @@ import java.util.List;
 public interface CartRepository {
     void save(Product product, String userId);
     Cart findById(Long cartId);
-    int updateById(Long cartId, int count);
-    List<Cart> findAll();
-    int deleteAll();
+    int updateById(Cart cart, long count);
 
+    List<Cart> findAllByUserId(String userId);
 
+    int deleteAllByUserId(String userId);
+
+    Cart existCart(Long productId,String userId);
 }

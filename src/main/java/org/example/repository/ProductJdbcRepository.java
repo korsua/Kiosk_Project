@@ -123,4 +123,34 @@ public class ProductJdbcRepository implements ProductRepository{
         return count;
     }
 
+    @Override
+    public Product findById(Long id) {
+        Product product = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            url = "jdbc:mysql://localhost/dev";
+            dbId = "root";
+            dbPw = "1234";
+            conn = DriverManager.getConnection(url, dbId, dbPw);
+            pstmt = conn.prepareStatement("select * from PRODUCT where productId = ?");
+            pstmt.setLong(1,id);
+            rs = pstmt.executeQuery();
+
+            if(rs.next()){
+                product = new Product();
+                product.setId(rs.getLong("productId"));
+                product.setName(rs.getString("name"));
+                product.setPrice(rs.getLong("price"));
+            }
+
+            pstmt.close();
+            conn.close();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return product;
+    }
+
 }
