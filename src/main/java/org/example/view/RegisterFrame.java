@@ -16,7 +16,8 @@ public class RegisterFrame extends JFrame{
     public RegisterFrame() {
         userService = UserService.getInstance();
 
-        add(panel);
+//        add(panel);
+        setContentPane(panel);
         setSize(700,500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

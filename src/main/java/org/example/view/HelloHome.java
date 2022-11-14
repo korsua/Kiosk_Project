@@ -10,7 +10,8 @@ public class HelloHome extends JFrame{
     private JPanel homePanel;
 
     public HelloHome(){
-        add(homePanel);
+//        add(homePanel);
+        setContentPane(homePanel);
         setSize(700,500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);

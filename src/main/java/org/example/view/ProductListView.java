@@ -3,7 +3,6 @@ package org.example.view;
 import org.example.model.Product;
 import org.example.repository.CartJdbcRepository;
 import org.example.repository.CartRepository;
-import org.example.repository.ProductJdbcRepository;
 import org.example.service.ProductService;
 
 import javax.swing.*;
@@ -32,7 +31,7 @@ public class ProductListView extends JFrame {
 
         Container ct = getContentPane();
         cartRepository = new CartJdbcRepository();
-        service = new ProductService(new ProductJdbcRepository());
+        service = ProductService.getInstance();
 
         setLayout(new BoxLayout(ct,BoxLayout.Y_AXIS));
 

@@ -10,4 +10,6 @@ public interface ProductRepository {
     Product findByName(String name);
     List<Product> findAll();
     int delete(String name);
+
+    Product findById(Long id);
 }
