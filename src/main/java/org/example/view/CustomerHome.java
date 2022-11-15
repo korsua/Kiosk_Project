@@ -5,6 +5,8 @@ import org.example.model.Product;
 import org.example.repository.CartJdbcRepository;
 import org.example.repository.CartRepository;
 import org.example.service.CartService;
+import org.example.service.OrderDetailService;
+import org.example.service.OrderService;
 import org.example.service.ProductService;
 
 import javax.swing.*;
@@ -27,14 +29,21 @@ public class CustomerHome extends JFrame {
 
     ProductService productService;
     CartRepository cartRepository;
+
+    OrderService orderService;
+
+    OrderDetailService orderDetailService;
     private String userId;
+    List<Cart> all;
 
 
     public CustomerHome(String userId) {
         cartService = CartService.getInstance();
         this.userId = userId;
         productService = ProductService.getInstance();
+        orderDetailService = OrderDetailService.getInstance();
         cartRepository = new CartJdbcRepository();
+        orderService = OrderService.getInstance();
         products = productService.findProducts();
 
         cartListPanel.setLayout(new BoxLayout(cartListPanel, BoxLayout.Y_AXIS));
@@ -61,7 +70,7 @@ public class CustomerHome extends JFrame {
     private void makeCartPanel() {
         totalPrice = 0L;
         cartListPanel.removeAll();
-        List<Cart> all = cartRepository.findAllByUserId(userId);
+        all = cartRepository.findAllByUserId(userId);
         JPanel header = new JPanel(new FlowLayout());
         JButton deleteAllBtn = new JButton("모두 삭제");
         JButton payAll = new JButton("모두 결제");
@@ -81,7 +90,7 @@ public class CustomerHome extends JFrame {
                 JButton plusBtn = new JButton("+");
                 JLabel productName = new JLabel(productService.findProductById(cart.getProductId()).getName());
                 JTextField countField = new JTextField(String.valueOf(cart.getAmount()));
-                JTextField priceField = new JTextField(String.valueOf(cartSumPrice));
+                JLabel priceField = new JLabel(String.valueOf(cartSumPrice) + "원");
                 cartPanel.add(minusBtn);
                 cartPanel.add(plusBtn);
                 cartPanel.add(productName);
@@ -90,7 +99,22 @@ public class CustomerHome extends JFrame {
 
                 cartListPanel.add(cartPanel);
                 minusBtn.addActionListener(e ->{
-                    countField.setText("3");
+                    cartRepository.updateById(cart, cart.getAmount() -1);
+                    cart.setAmount(cart.getAmount() -1);
+//                    countField.setText(String.valueOf(cart.getAmount() -1));
+                    if(cart.getAmount() <= 0){
+                        cartRepository.deleteByCartId(cart.getCartId());
+                    }
+                    makeCartPanel();
+                });
+                plusBtn.addActionListener(e ->{
+                    cartRepository.updateById(cart, cart.getAmount() +1);
+                    cart.setAmount(cart.getAmount() -1);
+//                    countField.setText(String.valueOf(cart.getAmount() + 1));
+//                    int targetPrice = Integer.parseInt(priceField.getText());
+//                    targetPrice += cart.getSalePrice();
+//                    priceField.setText(String.valueOf(targetPrice));
+                    makeCartPanel();
                 });
             }
         totalPriceLabel.setText(String.valueOf(totalPrice));
@@ -98,9 +122,21 @@ public class CustomerHome extends JFrame {
             cartRepository.deleteAllByUserId(userId);
             makeCartPanel();
         });
+        payAll.addActionListener(e ->{
+            if(JOptionPane.showConfirmDialog(null, "주문을 하시겠습니까. ? ", "결제진행", JOptionPane.YES_NO_OPTION) != 1){
+                long orderId = orderService.save(userId,totalPrice);
+                orderDetailService.PayAll(all,orderId);
+                cartRepository.deleteAllByUserId(userId);
+                makeCartPanel();
+            }else{
+                JOptionPane.showConfirmDialog(null, "주문실패", "주문실패",JOptionPane.DEFAULT_OPTION);
+            }
+
+        });
     }
     private void makeBtn() {
         productListPanel.setLayout(new BoxLayout(productListPanel, BoxLayout.Y_AXIS));
+        productListPanel.setPreferredSize(new Dimension(300,600));
         if (products != null) {
             for (Product product : products) {
                 JButton productBtn = new JButton(product.getName());

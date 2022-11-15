@@ -32,6 +32,6 @@ public class HelloHome extends JFrame{
     }
 
     public static void main(String[] args) {
-        new HelloHome();
+        new LoginFrame();
     }
 }

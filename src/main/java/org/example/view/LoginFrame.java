@@ -10,7 +10,7 @@ public class LoginFrame extends JFrame{
     private JTextField idField;
     private JPanel loginPanel;
     private JPasswordField pwField;
-    private JButton homeBtn;
+    private JButton registerBtn;
     private UserService userService;
 
     public LoginFrame() {
@@ -36,9 +36,9 @@ public class LoginFrame extends JFrame{
             }
 
         });
-        homeBtn.addActionListener((event) ->{
+        registerBtn.addActionListener(e -> {
             dispose();
-            new HelloHome();
+            new RegisterFrame();
         });
     }
 }

@@ -176,4 +176,30 @@ public class CartJdbcRepository implements CartRepository{
 
         return cart;
     }
+
+    @Override
+    public int deleteByCartId(long cartId) {
+        int i;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn = DriverManager.getConnection(url,id,pw);
+            pstmt = conn.prepareStatement("delete from CART where cartId = ?");
+            pstmt.setLong(1,cartId);
+            i = pstmt.executeUpdate();
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                pstmt.close();
+                conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return i;
+    }
 }
