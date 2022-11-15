@@ -2,7 +2,7 @@ package org.example.model;
 
 import java.time.LocalDateTime;
 
-public class Orders {
+public class Order {
     Long orderId;
     String userId;
     LocalDateTime regDate;

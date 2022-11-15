@@ -15,4 +15,5 @@ public interface CartRepository {
     int deleteAllByUserId(String userId);
 
     Cart existCart(Long productId,String userId);
+    int deleteByCartId(long cartId);
 }

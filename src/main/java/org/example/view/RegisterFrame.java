@@ -26,13 +26,13 @@ public class RegisterFrame extends JFrame{
             if(userService.join(idField.getText(), pwField.getText()) != null){
                 JOptionPane.showConfirmDialog(null,"회원가입성공",String.format("%s 로 회원가입하였습니다",idField.getText()),JOptionPane.PLAIN_MESSAGE);
                 dispose();
-                new HelloHome();
+                new LoginFrame();
             }
         });
 
         homeBtn.addActionListener(e ->{
             dispose();
-            new HelloHome();
+            new LoginFrame();
         });
     }
 }
