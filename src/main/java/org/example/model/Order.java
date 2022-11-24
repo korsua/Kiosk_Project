@@ -8,6 +8,16 @@ public class Order {
     LocalDateTime regDate;
     int status;
 
+    public Long getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Long totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    Long totalPrice;
+
     public Long getOrderId() {
         return orderId;
     }

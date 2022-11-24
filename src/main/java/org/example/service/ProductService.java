@@ -26,11 +26,15 @@ public class ProductService {
     public Product findProductByName(String name){
         return repository.findByName(name);
     }
+    public List<Product> findMatcherByName(String text){return repository.matcherProductsByName(text);}
     public Product findProductById(Long id){
         return repository.findById(id);
     }
     public void saveProduct(Product product) throws SQLException, ClassNotFoundException {
-        repository.save(product.getName(), product.getPrice());
+        repository.save(product);
     }
 
+    public void modifyProduct(Product product) {
+        repository.updateProduct(product);
+    }
 }

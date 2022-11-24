@@ -17,23 +17,29 @@ public class CartJdbcRepository implements CartRepository{
     final static String id = "root";
     final static String pw = "1234";
     @Override
-    public void save(Product product, String userId) {
+    public void save(Product product, String userId)  {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-
             conn = DriverManager.getConnection(url, id, pw);
+
             pstmt = conn.prepareStatement("insert into CART(userId,productId,price) values(?,?,?)");
             pstmt.setString(1,userId);
             pstmt.setLong(2,product.getId());
             pstmt.setLong(3, product.getPrice());
             pstmt.executeUpdate();
 
-            pstmt.close();
-            conn.close();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if(pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -60,6 +66,7 @@ public class CartJdbcRepository implements CartRepository{
                 cart.setAmount(amount);
             }
 
+            rs.close();
             pstmt.close();
             conn.close();
         } catch (ClassNotFoundException e) {
@@ -117,6 +124,7 @@ public class CartJdbcRepository implements CartRepository{
                 carts.add(cart);
             }
 
+            rs.close();
             pstmt.close();
             conn.close();
         } catch (ClassNotFoundException e) {
@@ -168,6 +176,9 @@ public class CartJdbcRepository implements CartRepository{
                 cart.setProductId(rs.getLong("productId"));
                 cart.setCartId(rs.getLong("cartId"));
             }
+            rs.close();
+            pstmt.close();
+            conn.close();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {

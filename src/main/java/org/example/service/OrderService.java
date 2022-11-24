@@ -1,7 +1,10 @@
 package org.example.service;
 
+import org.example.model.Order;
 import org.example.repository.OrderJdbcRepository;
 import org.example.repository.OrderRepository;
+
+import java.util.List;
 
 public class OrderService {
     OrderRepository orderRepository;
@@ -19,5 +22,11 @@ public class OrderService {
 
     public long save(String userId, long totalPrice){
         return orderRepository.save(userId,totalPrice);
+    }
+    public List<Order> findOrders(){
+        return orderRepository.findAll();
+    }
+    public int processOrderByOrderId(long orderId){
+        return orderRepository.updateStatusByOrderId(orderId);
     }
 }
