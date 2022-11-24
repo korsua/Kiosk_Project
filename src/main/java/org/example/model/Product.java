@@ -5,9 +5,20 @@ public class Product {
     String name;
     Long price;
 
-    public Product(){
+    String imgPath;
+
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+    public Product() {
 
     }
+
     public Product(Long id, String name, Long price) {
         this.id = id;
         this.name = name;

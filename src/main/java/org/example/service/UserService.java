@@ -5,6 +5,8 @@ import org.example.model.User;
 import org.example.repository.UserJdbcRepository;
 import org.example.repository.UserRepository;
 
+import java.sql.SQLException;
+
 public class UserService {
     private static UserRepository repository = null;
     private static UserService instance;
@@ -20,7 +22,7 @@ public class UserService {
     public User join(String userId, String userPw) {
         return repository.save(userId,userPw);
     }
-    public User loginById(String userId){
+    public User loginById(String userId) throws SQLException {
         return repository.findById(userId);
     }
 }

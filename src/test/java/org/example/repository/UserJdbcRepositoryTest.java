@@ -5,12 +5,14 @@ import org.example.model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
+
 class UserJdbcRepositoryTest {
 
     UserJdbcRepository repository;
     @Test
     @DisplayName("유저 아이디를 입력해서 유저를 반환을 받는다.")
-    public void findByUserIdTest() {
+    public void findByUserIdTest() throws SQLException {
         String userId = "bsa0530";
 
         repository = new UserJdbcRepository();

@@ -41,8 +41,8 @@ public class UserJdbcRepository implements UserRepository{
     }
 
     @Override
-    public User findById(String userId) {
-        User user = new User();
+    public User findById(String userId) throws SQLException, IllegalStateException {
+        User user = null;
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -54,11 +54,15 @@ public class UserJdbcRepository implements UserRepository{
 
             conn = DriverManager.getConnection(url, id, pw);
 
+            //sql exception 여기서 일어나니까
             pstmt = conn.prepareStatement("select userPw, role from USER where userId = ?");
             pstmt.setString(1,userId);
             rs = pstmt.executeQuery();
 
+            ResultSetMetaData metaData = rs.getMetaData();
 
+
+            user = new User();
             while(rs.next()){
                 String userPw = rs.getString(1);
                 Boolean role = rs.getBoolean(2);
@@ -66,13 +70,15 @@ public class UserJdbcRepository implements UserRepository{
                 user.setUserPw(userPw);
                 user.setRole(role);
             }
+            if(user.getUserId() == null){
+                user = null;
+                throw new IllegalStateException("아이디없음");
+            }
 
             rs.close();
             pstmt.close();
             conn.close();
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return user;

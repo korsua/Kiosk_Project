@@ -1,5 +1,6 @@
 package org.example.view;
 
+import org.example.controller.MoveToCustomerOrderpage;
 import org.example.model.Cart;
 import org.example.model.Product;
 import org.example.repository.CartJdbcRepository;
@@ -10,18 +11,26 @@ import org.example.service.OrderService;
 import org.example.service.ProductService;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 public class CustomerHome extends JFrame {
     private JPanel panel;
     private JTextField searchField;
-    private JButton searchBtn;
-    private JButton HelloHomeBtn;
     private JPanel productListPanel;
     private JLabel userIdLabel;
     private JPanel cartListPanel;
     private JScrollPane scrollpane;
+    private JPanel footerPanel;
+    private JPanel searchPanel;
+    private JPanel headerPanel;
+    private JButton deleteAllBtn;
+    private JButton payAllBtn;
+    private JTextArea requestMessageField;
     CartService cartService;
 
     private static long totalPrice = 0L;
@@ -33,75 +42,168 @@ public class CustomerHome extends JFrame {
     OrderService orderService;
 
     OrderDetailService orderDetailService;
-    private String userId;
+    public static String userId;
     List<Cart> all;
 
-
-    public CustomerHome(String userId) {
+    private void init() {
         cartService = CartService.getInstance();
-        this.userId = userId;
         productService = ProductService.getInstance();
         orderDetailService = OrderDetailService.getInstance();
         cartRepository = new CartJdbcRepository();
         orderService = OrderService.getInstance();
         products = productService.findProducts();
+    }
 
-        cartListPanel.setLayout(new BoxLayout(cartListPanel, BoxLayout.Y_AXIS));
-
-        makeBtn();
-        makeCartPanel();
-
+    public CustomerHome(String userId) {
+        this.userId = userId;
+        userIdLabel.setText(this.userId);
+        init();
         setContentPane(panel);
 
+        makeHeaderPanel();
+        makeProductPanel(products);
+        makeCartPanel();
 
-        userIdLabel.setText(userId);
-
-
-        setSize(700, 500);
+        makeFooterPanel();
+        setSize(900, 1000);
+        setMinimumSize(new Dimension(900,1000));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("회원페이지");
         setVisible(true);
-        HelloHomeBtn.addActionListener(e -> {
-            dispose();
-            new HelloHome();
+        userIdLabel.addMouseListener(new MoveToCustomerOrderpage((JFrame) SwingUtilities.getRoot(this),userIdLabel.getText()));
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            String text = "";
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                text = searchField.getText();
+                List<Product> matcherProducts = productService.findMatcherByName(text);
+
+                if(matcherProducts.size() == 0){
+                    makeProductPanel(null);
+                }
+                makeProductPanel(matcherProducts);
+
+
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                text = searchField.getText();
+                List<Product> matcherProducts = productService.findMatcherByName(text);
+
+                if(matcherProducts.size() == 0){
+                    makeProductPanel(null);
+                }
+                makeProductPanel(matcherProducts);
+
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                text = searchField.getText();
+                List<Product> matcherProducts = productService.findMatcherByName(text);
+
+                if(matcherProducts.size() == 0){
+                    makeProductPanel(null);
+                }
+                makeProductPanel(matcherProducts);
+
+            }
         });
     }
 
+
+
+    private void makeProductPanel(List<Product> productList) {
+        productListPanel.removeAll();
+        int i = 0;
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridy = 0;
+        if (productList != null) {
+            for (Product product : productList) {
+                if(i >= 5){
+                    i = 0;
+                    c.gridy++;
+
+                }
+                ProductContent productContent = new ProductContent(product, userId);
+                productListPanel.add(productContent,c);
+                productContent.addMouseListener(new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        System.out.println("hello");
+                        cartService.modifyCartCount(product, userId);
+                        makeCartPanel();
+                        repaint();
+                        revalidate();
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        productContent.setBackground(Color.BLUE);
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        productContent.setBackground(Color.GRAY);
+
+                    }
+                });
+                i++;
+            }
+        }
+        productListPanel.repaint();
+        productListPanel.revalidate();
+    }
+    private void makeHeaderPanel(){
+        userIdLabel.setText(userId);
+    }
     private void makeCartPanel() {
         totalPrice = 0L;
         cartListPanel.removeAll();
         all = cartRepository.findAllByUserId(userId);
-        JPanel header = new JPanel(new FlowLayout());
-        JButton deleteAllBtn = new JButton("모두 삭제");
-        JButton payAll = new JButton("모두 결제");
-        JLabel totalPriceLabel = new JLabel();
-        header.add(deleteAllBtn);
-        header.add(payAll);
-        header.add(totalPriceLabel);
-        cartListPanel.add(header);
 
 
         if (all != null)
             for(Cart cart : all){
                 long cartSumPrice = cart.getSalePrice() * cart.getAmount();
                 totalPrice += cartSumPrice;
-                JPanel cartPanel = new JPanel(new FlowLayout());
+                JPanel cartPanel = new JPanel(new GridBagLayout());
+                JLabel productName = new JLabel(productService.findProductById(cart.getProductId()).getName());
                 JButton minusBtn = new JButton("-");
                 JButton plusBtn = new JButton("+");
-                JLabel productName = new JLabel(productService.findProductById(cart.getProductId()).getName());
                 JTextField countField = new JTextField(String.valueOf(cart.getAmount()));
-                JLabel priceField = new JLabel(String.valueOf(cartSumPrice) + "원");
-                cartPanel.add(minusBtn);
-                cartPanel.add(plusBtn);
-                cartPanel.add(productName);
-                cartPanel.add(countField);
-                cartPanel.add(priceField);
+                JLabel priceField = new JLabel(cartSumPrice + "원");
+                GridBagConstraints top = new GridBagConstraints();
+                top.gridy = 0;
+                top.gridwidth = 3;
+                GridBagConstraints center = new GridBagConstraints();
+                center.gridy = 1;
+                center.gridwidth = 1;
+                GridBagConstraints bottom = new GridBagConstraints();
+                bottom.gridy = 2;
+                bottom.gridwidth = 3;
 
+                cartPanel.add(productName,top);
+                cartPanel.add(minusBtn,center);
+                cartPanel.add(countField,center);
+                cartPanel.add(plusBtn,center);
+                cartPanel.add(priceField,bottom);
+                cartPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 cartListPanel.add(cartPanel);
                 minusBtn.addActionListener(e ->{
                     cartRepository.updateById(cart, cart.getAmount() -1);
                     cart.setAmount(cart.getAmount() -1);
-//                    countField.setText(String.valueOf(cart.getAmount() -1));
                     if(cart.getAmount() <= 0){
                         cartRepository.deleteByCartId(cart.getCartId());
                     }
@@ -109,54 +211,41 @@ public class CustomerHome extends JFrame {
                 });
                 plusBtn.addActionListener(e ->{
                     cartRepository.updateById(cart, cart.getAmount() +1);
-                    cart.setAmount(cart.getAmount() -1);
-//                    countField.setText(String.valueOf(cart.getAmount() + 1));
-//                    int targetPrice = Integer.parseInt(priceField.getText());
-//                    targetPrice += cart.getSalePrice();
-//                    priceField.setText(String.valueOf(targetPrice));
+                    cart.setAmount(cart.getAmount() + 1);
                     makeCartPanel();
                 });
+                repaint();
+                revalidate();
+                payAllBtn.setText(totalPrice+"원 모두결제");
             }
-        totalPriceLabel.setText(String.valueOf(totalPrice));
-        deleteAllBtn.addActionListener(e ->{
-            cartRepository.deleteAllByUserId(userId);
-            makeCartPanel();
-        });
-        payAll.addActionListener(e ->{
+    }
+    private void makeFooterPanel(){
+        payAllBtn.setText(totalPrice+"원 모두결제");
+        payAllBtn.addActionListener(e ->{
             if(JOptionPane.showConfirmDialog(null, "주문을 하시겠습니까. ? ", "결제진행", JOptionPane.YES_NO_OPTION) != 1){
                 long orderId = orderService.save(userId,totalPrice);
                 orderDetailService.PayAll(all,orderId);
                 cartRepository.deleteAllByUserId(userId);
                 makeCartPanel();
+                payAllBtn.setText("모두결제");
+                repaint();
+                revalidate();
             }else{
                 JOptionPane.showConfirmDialog(null, "주문실패", "주문실패",JOptionPane.DEFAULT_OPTION);
             }
-
+        });
+        deleteAllBtn.addActionListener(e ->{
+            cartRepository.deleteAllByUserId(userId);
+            makeCartPanel();
+            repaint();
+            revalidate();
         });
     }
-    private void makeBtn() {
-        productListPanel.setLayout(new BoxLayout(productListPanel, BoxLayout.Y_AXIS));
-        productListPanel.setPreferredSize(new Dimension(300,600));
-        if (products != null) {
-            for (Product product : products) {
-                JButton productBtn = new JButton(product.getName());
-                productListPanel.add(productBtn);
 
-                productBtn.addActionListener(e -> {
-//                    cartRepository.save(product, this.userId);
-                    cartService.modifyCartCount(product, this.userId);
 
-                    // 리턴이 1이면 원래있던것을 개수를 추가해준다.
-                    makeCartPanel();
-                    repaint();
-                    revalidate();
-                });
-            }
-        }
-    }
 
 
     public static void main(String[] args) {
-        new CustomerHome("test");
+        new CustomerHome("qotndk0530");
     }
 }

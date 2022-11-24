@@ -5,6 +5,8 @@ import org.example.model.Product;
 import org.example.repository.CartJdbcRepository;
 import org.example.repository.CartRepository;
 
+import java.sql.SQLException;
+
 public class CartService {
 
     private CartRepository cartRepository;
@@ -23,7 +25,12 @@ public class CartService {
         Cart cart = cartRepository.existCart(product.getId(), userId);
 
         if(cart  == null){
-            cartRepository.save(product,userId);
+            System.out.println("svae!");
+            try {
+                cartRepository.save(product,userId);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }else{
             cartRepository.updateById(cart, cart.getAmount() + 1);
         }
