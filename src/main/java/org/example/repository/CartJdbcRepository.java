@@ -16,12 +16,30 @@ public class CartJdbcRepository implements CartRepository{
     final static String url = "jdbc:mysql://localhost/dev";
     final static String id = "root";
     final static String pw = "1234";
+
+    public CartJdbcRepository() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conn = DriverManager.getConnection(url, id, pw);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            if(conn != null) conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void save(Product product, String userId)  {
         try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url, id, pw);
-
             pstmt = conn.prepareStatement("insert into CART(userId,productId,price) values(?,?,?)");
             pstmt.setString(1,userId);
             pstmt.setLong(2,product.getId());
@@ -29,8 +47,6 @@ public class CartJdbcRepository implements CartRepository{
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } finally {
             if(pstmt != null) {
@@ -47,9 +63,6 @@ public class CartJdbcRepository implements CartRepository{
     public Cart findById(Long cartId) {
         Cart cart = null;
         try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            conn = DriverManager.getConnection(url, id, pw);
             pstmt = conn.prepareStatement("select * from CART WEHRE cartId = ?");
             pstmt.setLong(1,cartId);
             rs = pstmt.executeQuery();
@@ -66,13 +79,15 @@ public class CartJdbcRepository implements CartRepository{
                 cart.setAmount(amount);
             }
 
-            rs.close();
-            pstmt.close();
-            conn.close();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                if(rs != null ) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
         return cart;
     }
@@ -81,9 +96,6 @@ public class CartJdbcRepository implements CartRepository{
     public int updateById(Cart cart, long count) {
         int i = 0;
         try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            conn = DriverManager.getConnection(url, id, pw);
             pstmt = conn.prepareStatement("update CART " +
                     "set amount = ? where cartId = ? ");
             pstmt.setLong(1,count);
@@ -91,12 +103,14 @@ public class CartJdbcRepository implements CartRepository{
             i = pstmt.executeUpdate();
 
 
-            pstmt.close();
-            conn.close();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                if(pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         return i;
@@ -107,9 +121,6 @@ public class CartJdbcRepository implements CartRepository{
     public List<Cart> findAllByUserId(String userId) {
         List<Cart> carts = new ArrayList<>();
         try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            conn = DriverManager.getConnection(url, id, pw);
             pstmt = conn.prepareStatement("select * from CART WHERE userId = ?");
             pstmt.setString(1,userId);
             rs = pstmt.executeQuery();
@@ -124,13 +135,16 @@ public class CartJdbcRepository implements CartRepository{
                 carts.add(cart);
             }
 
-            rs.close();
-            pstmt.close();
-            conn.close();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if(pstmt != null ) pstmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
         }
         return carts;
     }
@@ -139,20 +153,19 @@ public class CartJdbcRepository implements CartRepository{
     public int deleteAllByUserId(String userId) {
         int count = 0;
         try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            conn = DriverManager.getConnection(url, id, pw);
             pstmt = conn.prepareStatement("delete from CART where userId = ?");
             pstmt.setString(1,userId);
             count = pstmt.executeUpdate();
 
 
-            pstmt.close();
-            conn.close();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                if(pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
         return count;
     }
@@ -161,8 +174,6 @@ public class CartJdbcRepository implements CartRepository{
     public Cart existCart(Long productId, String userId) {
         Cart cart = null;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url,id,pw);
             pstmt = conn.prepareStatement("select * from CART where userId = ? and productId = ?");
             pstmt.setString(1,userId);
             pstmt.setLong(2,productId);
@@ -176,13 +187,16 @@ public class CartJdbcRepository implements CartRepository{
                 cart.setProductId(rs.getLong("productId"));
                 cart.setCartId(rs.getLong("cartId"));
             }
-            rs.close();
-            pstmt.close();
-            conn.close();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }finally {
+            try {
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
         }
 
         return cart;
@@ -192,20 +206,15 @@ public class CartJdbcRepository implements CartRepository{
     public int deleteByCartId(long cartId) {
         int i;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url,id,pw);
             pstmt = conn.prepareStatement("delete from CART where cartId = ?");
             pstmt.setLong(1,cartId);
             i = pstmt.executeUpdate();
 
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }finally {
             try {
                 pstmt.close();
-                conn.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

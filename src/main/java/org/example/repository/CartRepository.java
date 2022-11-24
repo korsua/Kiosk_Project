@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface CartRepository {
+    void close();
     void save(Product product, String userId) throws SQLException;
     Cart findById(Long cartId);
     int updateById(Cart cart, long count);

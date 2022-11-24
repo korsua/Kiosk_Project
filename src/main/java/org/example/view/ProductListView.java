@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 
 public class ProductListView extends JFrame {
@@ -67,7 +68,11 @@ public class ProductListView extends JFrame {
             productBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    cartRepository.save(product,userId);
+                    try {
+                        cartRepository.save(product,userId);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
             panel.add(productBtn);
