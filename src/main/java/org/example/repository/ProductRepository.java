@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ProductRepository {
+    void close();
     int save(Product product) throws SQLException, ClassNotFoundException;
     Product findByName(String name);
     List<Product> findAll();

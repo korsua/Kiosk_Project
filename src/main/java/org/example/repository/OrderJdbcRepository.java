@@ -10,16 +10,35 @@ public class OrderJdbcRepository implements OrderRepository {
     final static String url = "jdbc:mysql://localhost/dev";
     final static String id = "root";
     final static String pw = "1234";
+    final static String driver = "com.mysql.cj.jdbc.Driver";
     Connection conn = null;
     PreparedStatement pstmt = null;
     ResultSet rs = null;
+
+    public OrderJdbcRepository() {
+        try {
+            Class.forName(driver);
+            conn = DriverManager.getConnection(url, id, pw);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            if(conn != null) conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public long save(String userId, long totalPrice) {
         long rowNum = 0;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url, id, pw);
             pstmt = conn.prepareStatement("insert into ORDERS(userId,totalPrice) values(?,?)");
             pstmt.setString(1, userId);
             pstmt.setLong(2, totalPrice);
@@ -31,15 +50,12 @@ public class OrderJdbcRepository implements OrderRepository {
                 rowNum = rs.getLong(1);
             }
 
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                rs.close();
-                pstmt.close();
-                conn.close();
+                if(rs!=null)rs.close();
+                if(pstmt != null) pstmt.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -62,8 +78,6 @@ public class OrderJdbcRepository implements OrderRepository {
     public List<Order> findAll() {
         List<Order> list = new ArrayList<>();
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url, id, pw);
             pstmt = conn.prepareStatement("select * from ORDERS where status < 2");
             rs = pstmt.executeQuery();
 
@@ -77,15 +91,12 @@ public class OrderJdbcRepository implements OrderRepository {
                 list.add(order);
             }
 
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                rs.close();
-                pstmt.close();
-                conn.close();
+                if(rs !=null) rs.close();
+                if(pstmt != null) pstmt.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -98,8 +109,6 @@ public class OrderJdbcRepository implements OrderRepository {
     public int updateStatusByOrderId(long orderId) {
         int result = 0;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url, id, pw);
             pstmt = conn.prepareStatement("update ORDERS set status = status + 1 where orderId = ?");
             pstmt.setLong(1,orderId);
             pstmt.executeUpdate();
@@ -113,19 +122,15 @@ public class OrderJdbcRepository implements OrderRepository {
             }
 
 
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                rs.close();
-                pstmt.close();
-                conn.close();
+                if(rs != null) rs.close();
+                if(pstmt != null) pstmt.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-
         }
         return result;
     }
