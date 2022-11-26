@@ -16,7 +16,9 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class CustomerHome extends JFrame {
     private JPanel panel;
@@ -52,6 +54,9 @@ public class CustomerHome extends JFrame {
         cartRepository = new CartJdbcRepository();
         orderService = OrderService.getInstance();
         products = productService.findProducts();
+        List<ProductContent> productContentList = new ArrayList<>();
+        for(Product product : products){
+        }
     }
 
     public CustomerHome(String userId) {
@@ -66,19 +71,31 @@ public class CustomerHome extends JFrame {
 
         makeFooterPanel();
         setSize(900, 1000);
-        setMinimumSize(new Dimension(900,1000));
+        setMinimumSize(new Dimension(900, 1000));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("회원페이지");
         setVisible(true);
-        userIdLabel.addMouseListener(new MoveToCustomerOrderpage((JFrame) SwingUtilities.getRoot(this),userIdLabel.getText()));
+        userIdLabel.addMouseListener(new MoveToCustomerOrderpage((JFrame) SwingUtilities.getRoot(this), userIdLabel.getText()));
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             String text = "";
+
             @Override
             public void insertUpdate(DocumentEvent e) {
                 text = searchField.getText();
-                List<Product> matcherProducts = productService.findMatcherByName(text);
+                List<Product> matcherProducts = new ArrayList<>();
+                // productService.findMatcherByName(text); 느림 .
+                // "*"+text+"*"
+                long start = System.currentTimeMillis();
+                for (int i = 0; i < products.size(); i++) {
+                    String pName = products.get(i).getName();
+                    String pMatcher = "^.*" + text + ".*";
+                    if (Pattern.matches(pMatcher, pName)) {
+                        matcherProducts.add(products.get(i));
+                    }
+                }
+                System.out.println(System.currentTimeMillis() - start + "MS UPDATE");
 
-                if(matcherProducts.size() == 0){
+                if (matcherProducts.size() == 0) {
                     makeProductPanel(null);
                 }
                 makeProductPanel(matcherProducts);
@@ -89,45 +106,45 @@ public class CustomerHome extends JFrame {
             @Override
             public void removeUpdate(DocumentEvent e) {
                 text = searchField.getText();
-                List<Product> matcherProducts = productService.findMatcherByName(text);
+                List<Product> matcherProducts = new ArrayList<>();
+                for (int i = 0; i < products.size(); i++) {
+                    String pName = products.get(i).getName();
+                    String pMatcher = "^.*" + text + ".*";
+                    if (Pattern.matches(pMatcher, pName)) {
+                        matcherProducts.add(products.get(i));
+                    }
+                }
 
-                if(matcherProducts.size() == 0){
+                if (matcherProducts.size() == 0) {
                     makeProductPanel(null);
                 }
                 makeProductPanel(matcherProducts);
-
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                text = searchField.getText();
-                List<Product> matcherProducts = productService.findMatcherByName(text);
-
-                if(matcherProducts.size() == 0){
-                    makeProductPanel(null);
-                }
-                makeProductPanel(matcherProducts);
-
             }
         });
     }
 
 
-
     private void makeProductPanel(List<Product> productList) {
+        long start = System.currentTimeMillis();
         productListPanel.removeAll();
         int i = 0;
         GridBagConstraints c = new GridBagConstraints();
         c.gridy = 0;
         if (productList != null) {
             for (Product product : productList) {
-                if(i >= 5){
+                if (i >= 5) {
                     i = 0;
                     c.gridy++;
 
                 }
+                long astart = System.currentTimeMillis();
                 ProductContent productContent = new ProductContent(product, userId);
-                productListPanel.add(productContent,c);
+                System.out.println(System.currentTimeMillis() - astart + "MS / addProductPanel");
+                productListPanel.add(productContent, c);
                 productContent.addMouseListener(new MouseListener() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -162,12 +179,15 @@ public class CustomerHome extends JFrame {
                 i++;
             }
         }
-        productListPanel.repaint();
         productListPanel.revalidate();
+        productListPanel.repaint();
+        System.out.println(System.currentTimeMillis() - start + "MS / makeProductPanel");
     }
-    private void makeHeaderPanel(){
+
+    private void makeHeaderPanel() {
         userIdLabel.setText(userId);
     }
+
     private void makeCartPanel() {
         totalPrice = 0L;
         cartListPanel.removeAll();
@@ -175,7 +195,7 @@ public class CustomerHome extends JFrame {
 
 
         if (all != null)
-            for(Cart cart : all){
+            for (Cart cart : all) {
                 long cartSumPrice = cart.getSalePrice() * cart.getAmount();
                 totalPrice += cartSumPrice;
                 JPanel cartPanel = new JPanel(new GridBagLayout());
@@ -194,55 +214,54 @@ public class CustomerHome extends JFrame {
                 bottom.gridy = 2;
                 bottom.gridwidth = 3;
 
-                cartPanel.add(productName,top);
-                cartPanel.add(minusBtn,center);
-                cartPanel.add(countField,center);
-                cartPanel.add(plusBtn,center);
-                cartPanel.add(priceField,bottom);
+                cartPanel.add(productName, top);
+                cartPanel.add(minusBtn, center);
+                cartPanel.add(countField, center);
+                cartPanel.add(plusBtn, center);
+                cartPanel.add(priceField, bottom);
                 cartPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 cartListPanel.add(cartPanel);
-                minusBtn.addActionListener(e ->{
-                    cartRepository.updateById(cart, cart.getAmount() -1);
-                    cart.setAmount(cart.getAmount() -1);
-                    if(cart.getAmount() <= 0){
+                minusBtn.addActionListener(e -> {
+                    cartRepository.updateById(cart, cart.getAmount() - 1);
+                    cart.setAmount(cart.getAmount() - 1);
+                    if (cart.getAmount() <= 0) {
                         cartRepository.deleteByCartId(cart.getCartId());
                     }
                     makeCartPanel();
                 });
-                plusBtn.addActionListener(e ->{
-                    cartRepository.updateById(cart, cart.getAmount() +1);
+                plusBtn.addActionListener(e -> {
+                    cartRepository.updateById(cart, cart.getAmount() + 1);
                     cart.setAmount(cart.getAmount() + 1);
                     makeCartPanel();
                 });
                 repaint();
                 revalidate();
-                payAllBtn.setText(totalPrice+"원 모두결제");
+                payAllBtn.setText(totalPrice + "원 모두결제");
             }
     }
-    private void makeFooterPanel(){
-        payAllBtn.setText(totalPrice+"원 모두결제");
-        payAllBtn.addActionListener(e ->{
-            if(JOptionPane.showConfirmDialog(null, "주문을 하시겠습니까. ? ", "결제진행", JOptionPane.YES_NO_OPTION) != 1){
-                long orderId = orderService.save(userId,totalPrice);
-                orderDetailService.PayAll(all,orderId);
+
+    private void makeFooterPanel() {
+        payAllBtn.setText(totalPrice + "원 모두결제");
+        payAllBtn.addActionListener(e -> {
+            if (JOptionPane.showConfirmDialog(null, "주문을 하시겠습니까. ? ", "결제진행", JOptionPane.YES_NO_OPTION) != 1) {
+                long orderId = orderService.save(userId, totalPrice);
+                orderDetailService.PayAll(all, orderId);
                 cartRepository.deleteAllByUserId(userId);
                 makeCartPanel();
                 payAllBtn.setText("모두결제");
                 repaint();
                 revalidate();
-            }else{
-                JOptionPane.showConfirmDialog(null, "주문실패", "주문실패",JOptionPane.DEFAULT_OPTION);
+            } else {
+                JOptionPane.showConfirmDialog(null, "주문실패", "주문실패", JOptionPane.DEFAULT_OPTION);
             }
         });
-        deleteAllBtn.addActionListener(e ->{
+        deleteAllBtn.addActionListener(e -> {
             cartRepository.deleteAllByUserId(userId);
             makeCartPanel();
             repaint();
             revalidate();
         });
     }
-
-
 
 
     public static void main(String[] args) {
