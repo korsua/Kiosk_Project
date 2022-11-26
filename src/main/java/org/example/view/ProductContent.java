@@ -8,6 +8,11 @@ import java.awt.*;
 
 public class ProductContent extends JPanel {
 
+    public String getProductName() {
+        return productName;
+    }
+
+    private String productName;
     private JButton 장바구니추가Button;
     private JLabel imgField;
     private JLabel nameField;
@@ -22,6 +27,7 @@ public class ProductContent extends JPanel {
     public ProductContent(Product product,int i) {
         init();
         Dimension myDimension = new Dimension(150,200);
+        productName = product.getName();
         add(panel);
         panel.setSize(200,200);
         panel.setMaximumSize(new Dimension(200,200));
@@ -44,7 +50,6 @@ public class ProductContent extends JPanel {
             new ManagerProductDetailView(product);
         });
         setVisible(true);
-
     }
     public ProductContent(Product product, String userId) {
         init();
@@ -56,8 +61,6 @@ public class ProductContent extends JPanel {
 
         ImageIcon imageIcon = new ImageIcon("img/"+ product.getImgPath());
         Image image = imageIcon.getImage();
-        Image scaledInstance = image.getScaledInstance(150, 150, image.SCALE_SMOOTH);
-        imageIcon = new ImageIcon(scaledInstance);
 
         imgField.setIcon(imageIcon);
         nameField.setText(product.getName());

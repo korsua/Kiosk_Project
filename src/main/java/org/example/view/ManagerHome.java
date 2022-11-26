@@ -8,6 +8,7 @@ import org.example.service.OrderService;
 import org.example.service.ProductService;
 import org.example.service.UserService;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -17,7 +18,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +68,7 @@ public class ManagerHome extends JFrame {
         c.gridy = 0;
         if (products != null)
             for (Product product : products) {
-                if( i >= 5){
+                if (i >= 5) {
                     i = 0;
                     c.gridy++;
                 }
@@ -74,6 +78,7 @@ public class ManagerHome extends JFrame {
                 i++;
             }
     }
+
     public ManagerHome() {
         productService = ProductService.getInstance();
         orderService = OrderService.getInstance();
@@ -175,13 +180,22 @@ public class ManagerHome extends JFrame {
                 File targetFile = new File(fullPath);
                 try {
                     productService.saveProduct(product);
-                    FileInputStream inputStream = new FileInputStream(targetFile);
-                    FileOutputStream outputStream = new FileOutputStream("img/" + fileName);
-                    byte[] b = new byte[1024];
-                    int s = 0;
-                    while ((s = inputStream.read(b)) != -1) {
-                        outputStream.write(b, 0, s);
-                    }
+//                    FileInputStream inputStream = new FileInputStream(targetFile);
+//                    FileOutputStream outputStream = new FileOutputStream("img/" + fileName);
+//                    byte[] b = new byte[1024];
+//                    int s = 0;
+//                    while ((s = inputStream.read(b)) != -1) {
+//                        outputStream.write(b, 0, s);
+//                    }
+                    /**============================================*/
+                    BufferedImage bImage = null;
+                    File initialImage = new File(fullPath);
+                    bImage = ImageIO.read(initialImage);
+
+                    BufferedImage resizeImage = (BufferedImage) resizeToBig(bImage, 150, 150);
+
+                    ImageIO.write(resizeImage, "png", new File("img/" + fileName));
+
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 } catch (ClassNotFoundException ex) {
@@ -315,5 +329,24 @@ public class ManagerHome extends JFrame {
 
     public static void main(String[] args) {
         new ManagerHome();
+    }
+
+    private Image resizeToBig(Image originalImage, int biggerWidth, int biggerHeight) {
+        int type = BufferedImage.TYPE_INT_ARGB;
+
+
+        BufferedImage resizedImage = new BufferedImage(biggerWidth, biggerHeight, type);
+        Graphics2D g = resizedImage.createGraphics();
+
+        g.setComposite(AlphaComposite.Src);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g.drawImage(originalImage, 0, 0, biggerWidth, biggerHeight, this);
+        g.dispose();
+
+
+        return resizedImage;
     }
 }
