@@ -16,12 +16,18 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class CustomerHome extends JFrame {
+    public Socket socket = null;
     private JPanel panel;
+
     private JTextField searchField;
     private JPanel productListPanel;
     private JLabel userIdLabel;
@@ -47,6 +53,73 @@ public class CustomerHome extends JFrame {
     public static String userId;
     List<Cart> all;
 
+    public void startClient() {
+        Thread thread = new Thread() {
+            public void run() {
+                try {
+                    socket = new Socket("localhost", 5505);
+                    receive();
+
+                } catch (Exception e) {
+                    if (!socket.isClosed()) {
+                        stopClient();
+                        System.out.println("[서버접속실패]");
+                    }
+
+                }
+            }
+        };
+        //지울거
+        thread.start();
+    }
+
+    public void stopClient() {
+        try{
+            if(socket != null && socket.isClosed() == false){
+                socket.close();
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void send(String message) {
+        Thread thread = new Thread(){
+            public void run(){
+                try{
+                    OutputStream out = socket.getOutputStream();
+                    byte[] buffer = message.getBytes("UTF-8");
+                    out.write(buffer);
+                    out.flush();
+
+                }catch (Exception e){
+                    stopClient();
+                }
+            }
+
+        };
+        thread.start();
+    }
+
+    public void receive() {
+        while (true) {
+            try{
+                InputStream in = socket.getInputStream();
+                byte[] buffer = new byte[512];
+                int length = in.read(buffer);
+                if(length == -1) throw new IOException();
+                String message = new String(buffer, 0, length, "UTF-8");
+                System.out.println(message);
+
+            } catch (IOException e) {
+                stopClient();
+                break;
+            }
+        }
+    }
+
+
     private void init() {
         cartService = CartService.getInstance();
         productService = ProductService.getInstance();
@@ -54,6 +127,9 @@ public class CustomerHome extends JFrame {
         cartRepository = new CartJdbcRepository();
         orderService = OrderService.getInstance();
         products = productService.findProducts();
+        startClient();
+        send("clinent meesage" +
+                "");
     }
 
     public CustomerHome(String userId) {
@@ -236,11 +312,12 @@ public class CustomerHome extends JFrame {
             if (JOptionPane.showConfirmDialog(null, "주문을 하시겠습니까. ? ", "결제진행", JOptionPane.YES_NO_OPTION) != 1) {
                 String message = requestMessageField.getText();
                 requestMessageField.setText("");
-                long orderId = orderService.save(userId, totalPrice,message);
+                long orderId = orderService.save(userId, totalPrice, message);
                 orderDetailService.PayAll(all, orderId);
                 cartRepository.deleteAllByUserId(userId);
                 makeCartPanel();
                 payAllBtn.setText("모두결제");
+                send("hi");
                 repaint();
                 revalidate();
             } else {
