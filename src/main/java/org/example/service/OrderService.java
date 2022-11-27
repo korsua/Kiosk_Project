@@ -4,6 +4,7 @@ import org.example.model.Order;
 import org.example.repository.OrderJdbcRepository;
 import org.example.repository.OrderRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class OrderService {
@@ -28,5 +29,8 @@ public class OrderService {
     }
     public int processOrderByOrderId(long orderId){
         return orderRepository.updateStatusByOrderId(orderId);
+    }
+    public String[][] requestProductOrder(LocalDate start, LocalDate end, int index){
+        return orderRepository.findAllProductOrder(start,end,index);
     }
 }
