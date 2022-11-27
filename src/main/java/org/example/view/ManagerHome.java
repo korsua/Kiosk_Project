@@ -7,6 +7,7 @@ import org.example.service.OrderDetailService;
 import org.example.service.OrderService;
 import org.example.service.ProductService;
 import org.example.service.UserService;
+import org.jdesktop.swingx.JXDatePicker;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,10 +21,10 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class ManagerHome extends JFrame{
@@ -48,6 +49,12 @@ public class ManagerHome extends JFrame{
     private JScrollPane myScrollPane;
     private JButton 파일추가;
     private JLabel fileInfo;
+    private JButton 상품매출Button;
+    private JPanel searchOrderBoard;
+    private JPanel searchOrderHeaderPanel;
+    private JPanel searchProductOrderFiled;
+    private JScrollPane searchScollPane;
+    private JLabel totalPriceFFiled;
 
     ProductService productService;
     OrderService orderService;
@@ -222,6 +229,11 @@ public class ManagerHome extends JFrame{
             revalidate();
 
         });
+        상품매출Button.addActionListener(e ->{
+            cardPanel.removeAll();
+            cardPanel.add(searchOrderBoard);
+            makeSearchOrderBoard();
+        });
         등록.addActionListener(e -> {
             Product product = new Product();
             product.setName(nameField.getText());
@@ -253,6 +265,58 @@ public class ManagerHome extends JFrame{
             fileName = String.valueOf(fc.getSelectedFile().getName());
             fileInfo.setText(fileName);
         });
+    }
+
+    private void makeSearchOrderBoard() {
+        searchProductOrderFiled.setLayout(new BorderLayout());
+        searchOrderHeaderPanel.removeAll();
+        JXDatePicker startDate = new JXDatePicker();
+        JXDatePicker endDate = new JXDatePicker();
+        JButton searchButton = new JButton("submit");
+        String[] choices = { "이름","판매량", "총 금액"};
+        JComboBox<String> comboBox = new JComboBox<>(choices);
+        startDate.setFormats("yyyy-MM-dd");
+        endDate.setFormats("yyyy-MM-dd");
+        searchOrderHeaderPanel.add(comboBox);
+        searchOrderHeaderPanel.add(startDate);
+        searchOrderHeaderPanel.add(new JLabel("-"));
+        searchOrderHeaderPanel.add(endDate);
+        searchOrderHeaderPanel.add(searchButton);
+        searchButton.addActionListener(e ->{
+            Vector<Object> tHeader = new Vector<>();
+            Vector<Vector<Object>> tContent = new Vector<>();
+            searchProductOrderFiled.removeAll();
+            Date date1 = startDate.getDate();
+            Date date2 = endDate.getDate();
+
+            LocalDate start = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate end = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            int selectedIndex = comboBox.getSelectedIndex();
+            String[] header = {"상품이름","개수","가격"};
+            String[][] strings = orderService.requestProductOrder(start, end, selectedIndex);
+            tHeader.addAll(Arrays.asList(header));
+
+            int totalPrice = 0;
+            for(String[] str : strings){
+//                tC.addAll(Arrays.asList(str));
+                Vector<Object> tC = new Vector<>();
+                Product productById = productService.findProductById(Long.parseLong(str[0]));
+
+                tC.add(productById.getName());
+                tC.add(str[1]);
+                tC.add(str[2]);
+                totalPrice += Integer.parseInt(str[2]);
+                tContent.add(tC);
+            }
+            JTable table = new JTable(tContent,tHeader);
+            JScrollPane scrollPane = new JScrollPane(table);
+            searchProductOrderFiled.add(scrollPane,BorderLayout.CENTER);
+            totalPriceFFiled.setText(String.valueOf(totalPrice)+" 원");
+            repaint();
+            revalidate();
+        });
+        repaint();
+        revalidate();
     }
 
     public void makeProductBoard(List<Product> products) {
@@ -314,6 +378,7 @@ public class ManagerHome extends JFrame{
             tC.add(order.getMessage());
 
             tContent.add(tC);
+            tContent.stream().forEach(System.out::println);
 
 
             JLabel orderLabel = new JLabel(order.getRegDate() + "" + order.getUserId() + " " + order.getStatus() + " " + order.getTotalPrice());

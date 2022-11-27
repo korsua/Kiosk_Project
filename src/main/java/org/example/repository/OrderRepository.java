@@ -2,6 +2,7 @@ package org.example.repository;
 
 import org.example.model.Order;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface OrderRepository {
@@ -12,4 +13,6 @@ public interface OrderRepository {
     List<Order> findAll();
 
     int updateStatusByOrderId(long orderId);
+
+    String[][] findAllProductOrder(LocalDate start, LocalDate end, int index);
 }
