@@ -3,6 +3,7 @@ package org.example.view;
 import org.example.model.Order;
 import org.example.model.OrderDetail;
 import org.example.model.Product;
+import org.example.network.ServerNet;
 import org.example.service.OrderDetailService;
 import org.example.service.OrderService;
 import org.example.service.ProductService;
@@ -23,15 +24,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
-public class ManagerHome extends JFrame {
+public class ManagerHome extends JFrame{
     private JButton 상품등록Button;
     private JButton 주문현황Button;
     private JButton 상품Button;
-    private JTextField textField1;
+    private JTextField searchField;
     private JButton button1;
     private JPanel productBoard;
     private JPanel cardPanel;
@@ -59,27 +62,10 @@ public class ManagerHome extends JFrame {
     List<Product> products;
 
     //    private JFileChooser fileChooser;
-    public void makeProductBoard(List<Product> products) {
-        productHello.setLayout(new GridBagLayout());
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout());
-        int i = 0;
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridy = 0;
-        if (products != null)
-            for (Product product : products) {
-                if (i >= 5) {
-                    i = 0;
-                    c.gridy++;
-                }
-//            JButton productLabel = new JButton(product.getName() + " " + product.getPrice());
-                ProductContent content = new ProductContent(product, 1);
-                productHello.add(content, c);
-                i++;
-            }
-    }
+
 
     public ManagerHome() {
+//        ServerNet serverNet = new ServerNet();
         productService = ProductService.getInstance();
         orderService = OrderService.getInstance();
         orderDetailService = OrderDetailService.getInstance();
@@ -90,6 +76,7 @@ public class ManagerHome extends JFrame {
 //        panel1.setLayout(new FlowLayout());
 
         setContentPane(panel);
+        makeProductBoard(products);
 
         setLocation(200, 200);
         setTitle("관리자 홈");
@@ -97,13 +84,23 @@ public class ManagerHome extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
-        textField1.getDocument().addDocumentListener(new DocumentListener() {
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
             String text = "";
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                text = textField1.getText();
-                List<Product> matcherProducts = productService.findMatcherByName(text);
+                text = searchField.getText();
+//                List<Product> matcherProducts = productService.findMatcherByName(text);
+                List<Product> matcherProducts = new ArrayList<>();
+
+                for (int i = 0; i < products.size(); i++) {
+                    String pName = products.get(i).getName();
+                    String pMatcher = "^.*" + text + ".*";
+                    if (Pattern.matches(pMatcher, pName)) {
+                        matcherProducts.add(products.get(i));
+                    }
+                }
+
 
                 if (matcherProducts.size() == 0) {
                     makeProductBoard(null);
@@ -115,8 +112,17 @@ public class ManagerHome extends JFrame {
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                text = textField1.getText();
-                List<Product> matcherProducts = productService.findMatcherByName(text);
+                text = searchField.getText();
+                List<Product> matcherProducts = new ArrayList<>();
+
+                for (int i = 0; i < products.size(); i++) {
+                    String pName = products.get(i).getName();
+                    String pMatcher = "^.*" + text + ".*";
+                    if (Pattern.matches(pMatcher, pName)) {
+                        matcherProducts.add(products.get(i));
+                    }
+                }
+
 
                 if (matcherProducts.size() == 0) {
                     makeProductBoard(null);
@@ -127,14 +133,6 @@ public class ManagerHome extends JFrame {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                text = textField1.getText();
-                List<Product> matcherProducts = productService.findMatcherByName(text);
-
-                if (matcherProducts.size() == 0) {
-                    makeProductBoard(null);
-                }
-                makeProductBoard(matcherProducts);
-
             }
         });
 
@@ -180,22 +178,11 @@ public class ManagerHome extends JFrame {
                 File targetFile = new File(fullPath);
                 try {
                     productService.saveProduct(product);
-//                    FileInputStream inputStream = new FileInputStream(targetFile);
-//                    FileOutputStream outputStream = new FileOutputStream("img/" + fileName);
-//                    byte[] b = new byte[1024];
-//                    int s = 0;
-//                    while ((s = inputStream.read(b)) != -1) {
-//                        outputStream.write(b, 0, s);
-//                    }
-                    /**============================================*/
                     BufferedImage bImage = null;
                     File initialImage = new File(fullPath);
                     bImage = ImageIO.read(initialImage);
-
                     BufferedImage resizeImage = (BufferedImage) resizeToBig(bImage, 150, 150);
-
-                    ImageIO.write(resizeImage, "png", new File("img/" + fileName));
-
+                    ImageIO.write(resizeImage, "png", targetFile);
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 } catch (ClassNotFoundException ex) {
@@ -209,8 +196,6 @@ public class ManagerHome extends JFrame {
             }
         });
         파일추가.addActionListener(new ActionListener() {
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 fc = new JFileChooser();
@@ -222,13 +207,36 @@ public class ManagerHome extends JFrame {
         });
     }
 
+    public void makeProductBoard(List<Product> products) {
+        cardPanel.removeAll();
+        cardPanel.add(productBoard);
+        productHello.removeAll();
+        productHello.setLayout(new GridBagLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout());
+        int i = 0;
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridy = 0;
+        if (products != null)
+            for (Product product : products) {
+                if (i >= 5) {
+                    i = 0;
+                    c.gridy++;
+                }
+                ProductContent content = new ProductContent(product, 1);
+                productHello.add(content, c);
+                i++;
+            }
+        repaint();
+        revalidate();
+    }
 
     public void makeOrderBoard() {
         orderCard.removeAll();
         orderCard.setLayout(new BorderLayout());
 
         List<Order> orders = orderService.findOrders();
-        String[] headerValue = {"주문아이디", "이름", "상태", "총 가격", "주문내용"};
+        String[] headerValue = {"주문아이디", "이름", "상태", "총 가격", "주문내용","요구사항"};
         Vector<Object> tHeader = new Vector<>();
         tHeader.addAll(Arrays.asList(headerValue));
 
@@ -257,6 +265,7 @@ public class ManagerHome extends JFrame {
             tC.add(String.valueOf(order.getStatus()));
             tC.add(String.valueOf(order.getTotalPrice()));
             tC.add(builder.toString());
+            tC.add(order.getMessage());
 
             tContent.add(tC);
 

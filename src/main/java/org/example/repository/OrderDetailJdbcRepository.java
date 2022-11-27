@@ -34,6 +34,7 @@ public class OrderDetailJdbcRepository implements OrderDetailRepository {
             pstmt.setLong(1, orderId);
             pstmt.setLong(2, cart.getProductId());
             pstmt.setLong(3, cart.getAmount());
+
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

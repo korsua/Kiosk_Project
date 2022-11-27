@@ -25,7 +25,6 @@ public class CartService {
         Cart cart = cartRepository.existCart(product.getId(), userId);
 
         if(cart  == null){
-            System.out.println("svae!");
             try {
                 cartRepository.save(product,userId);
             } catch (SQLException e) {

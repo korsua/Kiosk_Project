@@ -54,9 +54,6 @@ public class CustomerHome extends JFrame {
         cartRepository = new CartJdbcRepository();
         orderService = OrderService.getInstance();
         products = productService.findProducts();
-        List<ProductContent> productContentList = new ArrayList<>();
-        for(Product product : products){
-        }
     }
 
     public CustomerHome(String userId) {
@@ -70,8 +67,8 @@ public class CustomerHome extends JFrame {
         makeCartPanel();
 
         makeFooterPanel();
-        setSize(900, 1000);
-        setMinimumSize(new Dimension(900, 1000));
+        setSize(100, 1000);
+        setMinimumSize(new Dimension(1000, 1000));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("회원페이지");
         setVisible(true);
@@ -85,7 +82,6 @@ public class CustomerHome extends JFrame {
                 List<Product> matcherProducts = new ArrayList<>();
                 // productService.findMatcherByName(text); 느림 .
                 // "*"+text+"*"
-                long start = System.currentTimeMillis();
                 for (int i = 0; i < products.size(); i++) {
                     String pName = products.get(i).getName();
                     String pMatcher = "^.*" + text + ".*";
@@ -93,7 +89,6 @@ public class CustomerHome extends JFrame {
                         matcherProducts.add(products.get(i));
                     }
                 }
-                System.out.println(System.currentTimeMillis() - start + "MS UPDATE");
 
                 if (matcherProducts.size() == 0) {
                     makeProductPanel(null);
@@ -129,7 +124,6 @@ public class CustomerHome extends JFrame {
 
 
     private void makeProductPanel(List<Product> productList) {
-        long start = System.currentTimeMillis();
         productListPanel.removeAll();
         int i = 0;
         GridBagConstraints c = new GridBagConstraints();
@@ -141,14 +135,11 @@ public class CustomerHome extends JFrame {
                     c.gridy++;
 
                 }
-                long astart = System.currentTimeMillis();
                 ProductContent productContent = new ProductContent(product, userId);
-                System.out.println(System.currentTimeMillis() - astart + "MS / addProductPanel");
                 productListPanel.add(productContent, c);
                 productContent.addMouseListener(new MouseListener() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        System.out.println("hello");
                         cartService.modifyCartCount(product, userId);
                         makeCartPanel();
                         repaint();
@@ -181,7 +172,6 @@ public class CustomerHome extends JFrame {
         }
         productListPanel.revalidate();
         productListPanel.repaint();
-        System.out.println(System.currentTimeMillis() - start + "MS / makeProductPanel");
     }
 
     private void makeHeaderPanel() {
@@ -244,7 +234,9 @@ public class CustomerHome extends JFrame {
         payAllBtn.setText(totalPrice + "원 모두결제");
         payAllBtn.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(null, "주문을 하시겠습니까. ? ", "결제진행", JOptionPane.YES_NO_OPTION) != 1) {
-                long orderId = orderService.save(userId, totalPrice);
+                String message = requestMessageField.getText();
+                requestMessageField.setText("");
+                long orderId = orderService.save(userId, totalPrice,message);
                 orderDetailService.PayAll(all, orderId);
                 cartRepository.deleteAllByUserId(userId);
                 makeCartPanel();

@@ -20,8 +20,8 @@ public class OrderService {
         return instance;
     }
 
-    public long save(String userId, long totalPrice){
-        return orderRepository.save(userId,totalPrice);
+    public long save(String userId, long totalPrice,String message){
+        return orderRepository.save(userId,totalPrice,message);
     }
     public List<Order> findOrders(){
         return orderRepository.findAll();

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface OrderRepository {
     void close();
-    long save(String userId,long totalPrice);
+    long save(String userId,long totalPrice,String message);
     Order updateByOrderId(Long orderId, String status);
     Order findAllByUserId(String userId);
     List<Order> findAll();

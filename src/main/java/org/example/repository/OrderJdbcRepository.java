@@ -36,12 +36,13 @@ public class OrderJdbcRepository implements OrderRepository {
     }
 
     @Override
-    public long save(String userId, long totalPrice) {
+    public long save(String userId, long totalPrice,String message) {
         long rowNum = 0;
         try {
-            pstmt = conn.prepareStatement("insert into ORDERS(userId,totalPrice) values(?,?)");
+            pstmt = conn.prepareStatement("insert into ORDERS(userId,totalPrice,requirements) values(?,?,?)");
             pstmt.setString(1, userId);
             pstmt.setLong(2, totalPrice);
+            pstmt.setString(3,message);
             pstmt.executeUpdate();
 
             pstmt = conn.prepareStatement("select last_insert_id() from ORDERS LIMIT 1");
@@ -88,6 +89,7 @@ public class OrderJdbcRepository implements OrderRepository {
                 order.setUserId(rs.getString("userId"));
                 order.setStatus(rs.getInt("status"));
                 order.setTotalPrice(rs.getLong("totalPrice"));
+                order.setMessage(rs.getString("requirements"));
                 list.add(order);
             }
 
@@ -116,9 +118,7 @@ public class OrderJdbcRepository implements OrderRepository {
             pstmt.setLong(1,orderId);
             rs = pstmt.executeQuery();
             if(rs.next()){
-                System.out.println(result);
                 result = (int) rs.getLong(1);
-                System.out.println(result);
             }
 
 
