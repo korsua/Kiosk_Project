@@ -94,7 +94,6 @@ public class ProductJdbcRepository implements ProductRepository{
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                System.out.println("hi");
                 Product product = new Product();
                 product.setId(rs.getLong("productId"));
                 product.setName(rs.getString("name"));

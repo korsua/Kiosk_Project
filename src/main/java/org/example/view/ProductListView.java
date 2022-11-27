@@ -51,7 +51,6 @@ public class ProductListView extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Product productByName = service.findProductByName(searchTextField.getText());
-                System.out.println(productByName.getName());
             }
         });
 

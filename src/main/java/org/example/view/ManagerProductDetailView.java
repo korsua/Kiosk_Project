@@ -59,8 +59,6 @@ public class ManagerProductDetailView extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 fc = new JFileChooser();
                 fc.showOpenDialog(panel);
-                System.out.println(fc.getSelectedFile());
-                System.out.println(fc.getSelectedFile().getName());
                 fullPath = String.valueOf(fc.getSelectedFile());
                 fileName = fc.getSelectedFile().getName();
                 ImageIcon imageIcon = new ImageIcon(fullPath);

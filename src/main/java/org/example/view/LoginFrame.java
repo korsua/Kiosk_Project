@@ -51,7 +51,6 @@ public class LoginFrame extends JFrame {
             } catch (IllegalStateException ex){
                 errorMessage.setText(ex.getMessage());
                 errorMessage.setForeground(Color.red);
-                System.out.println("hi");
                 ex.getStackTrace();
             }
 

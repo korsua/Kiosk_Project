@@ -8,6 +8,16 @@ public class Order {
     LocalDateTime regDate;
     int status;
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    String message;
+
     public Long getTotalPrice() {
         return totalPrice;
     }
