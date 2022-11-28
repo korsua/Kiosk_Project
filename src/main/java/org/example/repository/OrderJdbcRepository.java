@@ -72,8 +72,37 @@ public class OrderJdbcRepository implements OrderRepository {
     }
 
     @Override
-    public Order findAllByUserId(String userId) {
-        return null;
+    public List<Order> findAllByUserId(String userId,int currentPage) {
+        List<Order> list = new ArrayList<>();
+        try {
+            pstmt = conn.prepareStatement("select * from ORDERS where userId =? order by status ASC ");
+            pstmt.setString(1,userId);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setRegDate(rs.getTimestamp("regDate").toLocalDateTime());
+                order.setOrderId(rs.getLong("orderId"));
+                order.setUserId(rs.getString("userId"));
+                order.setStatus(rs.getInt("status"));
+                order.setTotalPrice(rs.getLong("totalPrice"));
+                order.setMessage(rs.getString("requirements"));
+                System.out.println(order.getOrderId());
+                list.add(order);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+        return list;
     }
 
     @Override
