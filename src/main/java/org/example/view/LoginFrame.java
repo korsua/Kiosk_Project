@@ -26,32 +26,37 @@ public class LoginFrame extends JFrame {
         setVisible(true);
 
         submitBtn.addActionListener(e -> {
-            User user = null;
-            try {
-                user = userService.loginById(idField.getText());
+            if(idField.getText().equals("") && pwField.getText().equals("")){
+                errorMessage.setText("아이디와 비밀번호 둘다 입력해주세요 ");
+            }else{
+                User user = null;
+                try {
+                    user = userService.loginById(idField.getText());
 
-                if (user != null) {
-                    String pw = user.getUserPw();
-                    Boolean role = user.getRole();
-                    if (pw.equals(pwField.getText())) {
-                        if (role == true) {
-                            dispose();
-                            new ManagerHome();
+                    if (user != null) {
+                        String pw = user.getUserPw();
+                        Boolean role = user.getRole();
+                        if (pw.equals(pwField.getText())) {
+                            if (role == true) {
+                                dispose();
+                                new ManagerHome();
+                            } else {
+                                dispose();
+                                new CustomerHome(user.getUserId());
+                            }
                         } else {
-                            dispose();
-                            new CustomerHome(user.getUserId());
+                            JOptionPane.showConfirmDialog(null, "비밀번호 에러", "비밀번호가 틀렸습니다", JOptionPane.PLAIN_MESSAGE);
                         }
-                    } else {
-                        JOptionPane.showConfirmDialog(null, "비밀번호 에러", "비밀번호가 틀렸습니다", JOptionPane.PLAIN_MESSAGE);
                     }
+                } catch (SQLException ex) {
+                    errorMessage.setText(ex.getMessage());
+                    throw new RuntimeException(ex);
+                } catch (IllegalStateException ex){
+                    errorMessage.setText(ex.getMessage());
+                    errorMessage.setForeground(Color.red);
+                    ex.getStackTrace();
                 }
-            } catch (SQLException ex) {
-                errorMessage.setText("1");
-                throw new RuntimeException(ex);
-            } catch (IllegalStateException ex){
-                errorMessage.setText(ex.getMessage());
-                errorMessage.setForeground(Color.red);
-                ex.getStackTrace();
+
             }
 
 

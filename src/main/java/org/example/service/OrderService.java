@@ -24,6 +24,7 @@ public class OrderService {
     public long save(String userId, long totalPrice,String message){
         return orderRepository.save(userId,totalPrice,message);
     }
+    public List<Order> findOrdersById(String userId,int currentPage){return orderRepository.findAllByUserId(userId,currentPage);}
     public List<Order> findOrders(){
         return orderRepository.findAll();
     }

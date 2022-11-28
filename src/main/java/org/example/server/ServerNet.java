@@ -35,11 +35,8 @@ public class ServerNet {
             return;
         }
         Runnable thread = () -> {
-            System.out.println("hi");
             while (true) {
-                System.out.println("hi");
                 try {
-                    System.out.println("hi"); // 여기까진 됌
                     Socket socket = serverSocket.accept(); // 이게 문제야
                     clients.add(new ClientNet(socket));
                     System.out.println("[클라이언트 접속]"

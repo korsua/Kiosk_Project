@@ -165,7 +165,6 @@ public class ManagerHome extends JFrame{
             @Override
             public void insertUpdate(DocumentEvent e) {
                 text = searchField.getText();
-//                List<Product> matcherProducts = productService.findMatcherByName(text);
                 List<Product> matcherProducts = new ArrayList<>();
 
                 for (int i = 0; i < products.size(); i++) {
@@ -339,8 +338,8 @@ public class ManagerHome extends JFrame{
                 productHello.add(content, c);
                 i++;
             }
-        repaint();
-        revalidate();
+        cardPanel.repaint();
+        cardPanel.revalidate();
     }
 
     public void makeOrderBoard() {
@@ -372,7 +371,8 @@ public class ManagerHome extends JFrame{
             Vector<Object> tC = new Vector<>();
             tC.add(String.valueOf(order.getOrderId()));
             tC.add(String.valueOf(order.getUserId()));
-            tC.add(String.valueOf(order.getStatus()));
+            String c_status = statusMapper(order.getStatus());
+            tC.add(c_status);
             tC.add(String.valueOf(order.getTotalPrice()));
             tC.add(builder.toString());
             tC.add(order.getMessage());
@@ -400,7 +400,9 @@ public class ManagerHome extends JFrame{
                     getRootPane().repaint();
                     getRootPane().revalidate();
                 } else {
-                    table.setValueAt(i, table.getSelectedRow(), 2);
+                    String c_status = statusMapper(i);
+                    table.setValueAt(c_status, table.getSelectedRow(), 2);
+//                    makeOrderBoard();
                 }
 
             }
@@ -430,6 +432,12 @@ public class ManagerHome extends JFrame{
         repaint();
         revalidate();
 
+    }
+
+    private String statusMapper(int status) {
+        if(status == 0 ) return "주문 확인";
+        if(status == 1 ) return "진행중";
+        return "주문완료";
     }
 
     public static void main(String[] args) {

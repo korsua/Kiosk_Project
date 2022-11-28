@@ -94,7 +94,4 @@ public class ClientNet {
 //        throw new RuntimeException(e);
 //    }
 
-    public static void main(String[] args) {
-//        new ClientNet();
-    }
 }
