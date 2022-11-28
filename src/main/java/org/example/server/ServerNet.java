@@ -9,7 +9,12 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerNet {
+public class ServerNet extends Thread{
+    @Override
+    public void run() {
+        startServer();
+    }
+
     public static ExecutorService threadPool;
     public static Vector<ClientNet> clients = new Vector<>();
     ServerSocket serverSocket = null;
@@ -106,4 +111,5 @@ public class ServerNet {
 public static void main(String[] args) {
         new ServerNet().startServer();
 }
+
 }

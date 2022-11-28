@@ -65,7 +65,6 @@ public class ManagerHome extends JFrame{
     private String fileName;
     List<Product> products;
 
-    //    private JFileChooser fileChooser;
 
 
     public void startClient() {
@@ -136,19 +135,13 @@ public class ManagerHome extends JFrame{
         }
     }
     public ManagerHome() {
-//        ServerNet serverNet = new ServerNet();
-//        serverNet.startServer();
-        //여기
         startClient();
 
         productService = ProductService.getInstance();
         orderService = OrderService.getInstance();
         orderDetailService = OrderDetailService.getInstance();
         userService = UserService.getInstance();
-//        fileChooser = new JFileChooser();
         products = productService.findProducts();
-//        JPanel panel1 = new JPanel();
-//        panel1.setLayout(new FlowLayout());
 
         setContentPane(panel);
         makeProductBoard(products);
@@ -213,7 +206,6 @@ public class ManagerHome extends JFrame{
         상품Button.addActionListener(e -> {
             cardPanel.removeAll();
             cardPanel.add(productBoard);
-            productHello.removeAll();
             makeProductBoard(products);
         });
         주문현황Button.addActionListener(e -> {
@@ -238,6 +230,7 @@ public class ManagerHome extends JFrame{
             product.setName(nameField.getText());
             product.setPrice(Long.valueOf(priceField.getText()));
             product.setImgPath(fileName);
+            System.out.println(fullPath);
             File targetFile = new File(fullPath);
             try {
                 productService.saveProduct(product);
@@ -246,6 +239,7 @@ public class ManagerHome extends JFrame{
                 bImage = ImageIO.read(initialImage);
                 BufferedImage resizeImage = (BufferedImage) resizeToBig(bImage, 150, 150);
                 ImageIO.write(resizeImage, "png", targetFile);
+                ImageIO.write(resizeImage, "png", new File("img/"+fileName));
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             } catch (ClassNotFoundException ex) {
@@ -319,8 +313,6 @@ public class ManagerHome extends JFrame{
     }
 
     public void makeProductBoard(List<Product> products) {
-        cardPanel.removeAll();
-        cardPanel.add(productBoard);
         productHello.removeAll();
         productHello.setLayout(new GridBagLayout());
         JPanel panel = new JPanel();
@@ -338,8 +330,8 @@ public class ManagerHome extends JFrame{
                 productHello.add(content, c);
                 i++;
             }
-        cardPanel.repaint();
-        cardPanel.revalidate();
+        productHello.repaint();
+        productHello.revalidate();
     }
 
     public void makeOrderBoard() {
