@@ -156,8 +156,7 @@ public class CustomerHome extends JFrame {
             public void insertUpdate(DocumentEvent e) {
                 text = searchField.getText();
                 List<Product> matcherProducts = new ArrayList<>();
-                // productService.findMatcherByName(text); 느림 .
-                // "*"+text+"*"
+
                 for (int i = 0; i < products.size(); i++) {
                     String pName = products.get(i).getName();
                     String pMatcher = "^.*" + text + ".*";
