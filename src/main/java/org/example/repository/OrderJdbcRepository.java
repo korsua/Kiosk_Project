@@ -207,4 +207,26 @@ public class OrderJdbcRepository implements OrderRepository {
         }
         return result;
     }
+
+    @Override
+    public void deleteById(int orderId) {
+        try {
+            pstmt = conn.prepareStatement("delete from ORDER_DETAIL where orderId = ?");
+            pstmt.setInt(1,orderId);
+            pstmt.executeUpdate();
+            pstmt = conn.prepareStatement("delete from ORDERS where orderId = ?");
+            pstmt.setInt(1,orderId);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmt != null) pstmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }

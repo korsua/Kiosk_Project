@@ -15,4 +15,6 @@ public interface OrderRepository {
     int updateStatusByOrderId(long orderId);
 
     String[][] findAllProductOrder(LocalDate start, LocalDate end, int index);
+
+    void deleteById(int orderId);
 }
