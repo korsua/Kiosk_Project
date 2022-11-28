@@ -98,7 +98,7 @@ public class CustomerOrderPage extends JFrame{
             }
         }
         for(Order order : orders){
-            OrderRowPanel orderRowPanel = new OrderRowPanel(order);
+            OrderRowPanel orderRowPanel = new OrderRowPanel(order,userId);
             layout(orderRowPanel,0,i++,1,1);
         }
     }

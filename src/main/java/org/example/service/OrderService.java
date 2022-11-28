@@ -34,4 +34,8 @@ public class OrderService {
     public String[][] requestProductOrder(LocalDate start, LocalDate end, int index){
         return orderRepository.findAllProductOrder(start,end,index);
     }
+
+    public void removeOrder(int orderId) {
+        orderRepository.deleteById(orderId);
+    }
 }

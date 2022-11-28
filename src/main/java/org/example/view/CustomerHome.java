@@ -333,6 +333,6 @@ public class CustomerHome extends JFrame {
 
 
     public static void main(String[] args) {
-        new CustomerHome("qotndk0530");
+        new CustomerHome("qotndk530");
     }
 }
