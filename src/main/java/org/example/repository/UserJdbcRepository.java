@@ -46,8 +46,6 @@ public class UserJdbcRepository implements UserRepository{
             user.setUserId(userId);
             user.setUserPw(userPw);
 //            conn.commit();
-            pstmt.close();
-            conn.close();
         } catch (SQLException e) {
 //            conn.rollback();
             throw new RuntimeException(e);

@@ -33,7 +33,7 @@ public class ManagerHome extends JFrame{
     private JButton 주문현황Button;
     private JButton 상품Button;
     private JTextField searchField;
-    private JButton button1;
+    private JButton 검색Button;
     private JPanel productBoard;
     private JPanel cardPanel;
     private JPanel panel;
