@@ -315,6 +315,9 @@ public class ManagerHome extends JFrame{
     public void makeProductBoard(List<Product> products) {
         productHello.removeAll();
         productHello.setLayout(new GridBagLayout());
+        // #1 ISSUE CLOSE
+        repaint();
+        revalidate();
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout());
         int i = 0;
