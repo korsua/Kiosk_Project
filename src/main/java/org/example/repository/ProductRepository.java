@@ -10,7 +10,7 @@ public interface ProductRepository {
     int save(Product product) throws SQLException, ClassNotFoundException;
     Product findByName(String name);
     List<Product> findAll();
-    int delete(String name);
+    int delete(Product product);
 
     Product findById(Long id);
 

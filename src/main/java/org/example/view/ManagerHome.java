@@ -226,6 +226,8 @@ public class ManagerHome extends JFrame{
             makeSearchOrderBoard();
         });
         등록.addActionListener(e -> {
+            cardPanel.removeAll();
+            cardPanel.add(productBoard);
             Product product = new Product();
             product.setName(nameField.getText());
             product.setPrice(Long.valueOf(priceField.getText()));
@@ -250,6 +252,7 @@ public class ManagerHome extends JFrame{
                 throw new RuntimeException(ex);
             }
             products = productService.findProducts();
+            makeProductBoard(products);
         });
         파일추가.addActionListener(e -> {
             fc = new JFileChooser();
@@ -270,6 +273,7 @@ public class ManagerHome extends JFrame{
         JComboBox<String> comboBox = new JComboBox<>(choices);
         startDate.setFormats("yyyy-MM-dd");
         endDate.setFormats("yyyy-MM-dd");
+        searchButton.setText("검색");
         searchOrderHeaderPanel.add(comboBox);
         searchOrderHeaderPanel.add(startDate);
         searchOrderHeaderPanel.add(new JLabel("-"));
@@ -289,7 +293,7 @@ public class ManagerHome extends JFrame{
             String[][] strings = orderService.requestProductOrder(start, end, selectedIndex);
             tHeader.addAll(Arrays.asList(header));
 
-            int totalPrice = 0;
+            long totalPrice = 0;
             for(String[] str : strings){
 //                tC.addAll(Arrays.asList(str));
                 Vector<Object> tC = new Vector<>();
@@ -297,8 +301,9 @@ public class ManagerHome extends JFrame{
 
                 tC.add(productById.getName());
                 tC.add(str[1]);
-                tC.add(str[2]);
-                totalPrice += Integer.parseInt(str[2]);
+                long l = productById.getPrice() * Integer.parseInt(str[1]);
+                tC.add(l);
+                totalPrice += l;
                 tContent.add(tC);
             }
             JTable table = new JTable(tContent,tHeader);
@@ -315,6 +320,9 @@ public class ManagerHome extends JFrame{
     public void makeProductBoard(List<Product> products) {
         productHello.removeAll();
         productHello.setLayout(new GridBagLayout());
+        // #1 ISSUE CLOSE
+        repaint();
+        revalidate();
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout());
         int i = 0;
