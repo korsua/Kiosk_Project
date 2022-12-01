@@ -37,4 +37,5 @@ public class ProductService {
     public void modifyProduct(Product product) {
         repository.updateProduct(product);
     }
+    public void deleteProduct(Product product) {repository.delete(product);}
 }
