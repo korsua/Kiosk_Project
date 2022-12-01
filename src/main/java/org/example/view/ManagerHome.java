@@ -292,7 +292,7 @@ public class ManagerHome extends JFrame{
             String[][] strings = orderService.requestProductOrder(start, end, selectedIndex);
             tHeader.addAll(Arrays.asList(header));
 
-            int totalPrice = 0;
+            long totalPrice = 0;
             for(String[] str : strings){
 //                tC.addAll(Arrays.asList(str));
                 Vector<Object> tC = new Vector<>();
@@ -300,8 +300,9 @@ public class ManagerHome extends JFrame{
 
                 tC.add(productById.getName());
                 tC.add(str[1]);
-                tC.add(str[2]);
-                totalPrice += Integer.parseInt(str[2]);
+                long l = productById.getPrice() * Integer.parseInt(str[1]);
+                tC.add(l);
+                totalPrice += l;
                 tContent.add(tC);
             }
             JTable table = new JTable(tContent,tHeader);
