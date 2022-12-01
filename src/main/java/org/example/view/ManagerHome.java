@@ -226,6 +226,8 @@ public class ManagerHome extends JFrame{
             makeSearchOrderBoard();
         });
         등록.addActionListener(e -> {
+            cardPanel.removeAll();
+            cardPanel.add(productBoard);
             Product product = new Product();
             product.setName(nameField.getText());
             product.setPrice(Long.valueOf(priceField.getText()));
@@ -250,6 +252,7 @@ public class ManagerHome extends JFrame{
                 throw new RuntimeException(ex);
             }
             products = productService.findProducts();
+            makeProductBoard(products);
         });
         파일추가.addActionListener(e -> {
             fc = new JFileChooser();
