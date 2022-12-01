@@ -273,6 +273,7 @@ public class ManagerHome extends JFrame{
         JComboBox<String> comboBox = new JComboBox<>(choices);
         startDate.setFormats("yyyy-MM-dd");
         endDate.setFormats("yyyy-MM-dd");
+        searchButton.setText("검색");
         searchOrderHeaderPanel.add(comboBox);
         searchOrderHeaderPanel.add(startDate);
         searchOrderHeaderPanel.add(new JLabel("-"));
