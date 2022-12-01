@@ -18,6 +18,7 @@ public class ManagerProductDetailView extends JFrame{
     private JButton 뒤로가기Button;
     private JPanel panel;
     private JLabel imgField;
+    private JButton 삭제Button;
     String fullPath;
     String fileName;
     ProductService productService;
@@ -94,8 +95,16 @@ public class ManagerProductDetailView extends JFrame{
                 updateProduct.setName(String.valueOf(productNameField.getText()));
                 updateProduct.setImgPath(fileName);
                 productService.modifyProduct(updateProduct);
+                dispose();
+                new ManagerHome();
 
             }
+        });
+        삭제Button.addActionListener(e ->{
+            productService.deleteProduct(product);
+            dispose();
+            new ManagerHome();
+
         });
     }
 

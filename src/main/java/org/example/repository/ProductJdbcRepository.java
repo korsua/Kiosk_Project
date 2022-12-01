@@ -117,13 +117,12 @@ public class ProductJdbcRepository implements ProductRepository{
     }
 
     @Override
-    public int delete(String name) {
+    public int delete(Product product) {
         int count = 0;
         try {
             pstmt = conn.prepareStatement("delete from PRODUCT where name=?");
-            pstmt.setString(1,name);
+            pstmt.setString(1,product.getName());
             count = pstmt.executeUpdate();
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }finally {
