@@ -3,10 +3,12 @@ package org.example.view;
 import org.example.model.Product;
 import org.example.service.ProductService;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class ManagerProductDetailView extends JFrame{
@@ -76,14 +78,12 @@ public class ManagerProductDetailView extends JFrame{
                 File file = new File("img/"+fileName);
                 if (!file.exists()) {
                     try {
+                        BufferedImage bImage = null;
                         File targetFile = new File(fullPath);
-                        FileInputStream inputStream =new FileInputStream(targetFile);
-                        FileOutputStream outputStream = new FileOutputStream(file);
-                        int s = 0 ;
-                        byte[] b = new byte[1024];
-                        while((s = inputStream.read(b)) != -1){
-                            outputStream.write(b,0,s);
-                        }
+                        bImage = ImageIO.read(targetFile);
+                        BufferedImage resizeImage = (BufferedImage) resizeToBig(bImage, 150, 150);
+//                        ImageIO.write(resizeImage, "png", targetFile);
+                        ImageIO.write(resizeImage, "png", new File("img/"+fileName));
                     } catch (FileNotFoundException ex) {
                         throw new RuntimeException(ex);
                     } catch (IOException ex) {
@@ -115,5 +115,24 @@ public class ManagerProductDetailView extends JFrame{
         product.setPrice(1000L);
         product.setId(1L);
         new ManagerProductDetailView(product);
+    }
+
+    private Image resizeToBig(Image originalImage, int biggerWidth, int biggerHeight) {
+        int type = BufferedImage.TYPE_INT_ARGB;
+
+
+        BufferedImage resizedImage = new BufferedImage(biggerWidth, biggerHeight, type);
+        Graphics2D g = resizedImage.createGraphics();
+
+        g.setComposite(AlphaComposite.Src);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g.drawImage(originalImage, 0, 0, biggerWidth, biggerHeight, this);
+        g.dispose();
+
+
+        return resizedImage;
     }
 }
