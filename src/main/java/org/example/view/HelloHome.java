@@ -33,5 +33,7 @@ public class HelloHome extends JFrame{
 
     public static void main(String[] args) {
         new LoginFrame();
+        new LoginFrame();
+        new ManagerHome();
     }
 }

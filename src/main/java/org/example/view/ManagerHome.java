@@ -298,14 +298,14 @@ public class ManagerHome extends JFrame{
             String[][] strings = orderService.requestProductOrder(start, end, selectedIndex);
             tHeader.addAll(Arrays.asList(header));
 
-            long totalPrice = 0;
+            int totalPrice = 0;
             for(String[] str : strings){
-//                tC.addAll(Arrays.asList(str));
                 Vector<Object> tC = new Vector<>();
                 Product productById = productService.findProductById(Long.parseLong(str[0]));
                 tC.add(productById.getName());
                 tC.add(str[1]);
                 tC.add(str[2]);
+                totalPrice += Integer.parseInt(str[2]);
                 tContent.add(tC);
             }
             JTable table = new JTable(tContent,tHeader);
