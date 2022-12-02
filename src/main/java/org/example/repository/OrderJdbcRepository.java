@@ -175,7 +175,7 @@ public class OrderJdbcRepository implements OrderRepository {
                 case 1 : orderflag = "amount"; break;
                 case 2 : orderflag = "totalPrice"; break;
             }
-            pstmt = conn.prepareStatement(" select OD.productId,  SUM(OD.amount) amount  " +
+            pstmt = conn.prepareStatement(" select OD.productId,  SUM(OD.amount) amount, SUM(amount)* (select price from PRODUCT P where P.productId = OD.productId) totalPrice  " +
                     "from ORDER_DETAIL OD , ORDERS O " +
                     "where OD.orderId = O.orderId " +
                     "and DATE_FORMAT(regDate,'%Y-%m-%d') >= DATE_FORMAT(?,'%Y-%m-%d') " +
@@ -188,8 +188,8 @@ public class OrderJdbcRepository implements OrderRepository {
             while(rs.next()){
                 long productId = rs.getLong("productId");
                 long amount = rs.getLong("amount");
-                System.out.println(amount);
-                list.add(new String[]{String.valueOf(productId),String.valueOf(amount)});
+                long totalPrice = rs.getLong("totalPrice");
+                list.add(new String[]{String.valueOf(productId),String.valueOf(amount),String.valueOf(totalPrice)});
             }
 
         } catch (SQLException e) {
@@ -202,11 +202,11 @@ public class OrderJdbcRepository implements OrderRepository {
                 throw new RuntimeException(e);
             }
         }
-        String[][] result = new String[list.size()][2];
+        String[][] result = new String[list.size()][3];
         for(int i = 0 ; i< list.size();i++){
             result[i][0] = list.get(i)[0];
             result[i][1] = list.get(i)[1];
-//            result[i][2] = list.get(i)[2];
+            result[i][2] = list.get(i)[2];
         }
         return result;
     }

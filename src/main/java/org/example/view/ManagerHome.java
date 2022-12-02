@@ -273,6 +273,11 @@ public class ManagerHome extends JFrame{
         JComboBox<String> comboBox = new JComboBox<>(choices);
         startDate.setFormats("yyyy-MM-dd");
         endDate.setFormats("yyyy-MM-dd");
+        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDateMinusOneMonth = currentDate.minusMonths(1L);
+        startDate.setDate(java.sql.Date.valueOf(currentDateMinusOneMonth));
+        endDate.setDate(java.sql.Date.valueOf(currentDate));
+
         searchButton.setText("검색");
         searchOrderHeaderPanel.add(comboBox);
         searchOrderHeaderPanel.add(startDate);
@@ -298,12 +303,9 @@ public class ManagerHome extends JFrame{
 //                tC.addAll(Arrays.asList(str));
                 Vector<Object> tC = new Vector<>();
                 Product productById = productService.findProductById(Long.parseLong(str[0]));
-
                 tC.add(productById.getName());
                 tC.add(str[1]);
-                long l = productById.getPrice() * Integer.parseInt(str[1]);
-                tC.add(l);
-                totalPrice += l;
+                tC.add(str[2]);
                 tContent.add(tC);
             }
             JTable table = new JTable(tContent,tHeader);
